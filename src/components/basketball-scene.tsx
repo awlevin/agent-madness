@@ -128,6 +128,9 @@ export default function BasketballScene() {
     ball.add(seam2);
 
     // ── Hoops ──
+    const rimPositions = { left: -9.1, right: 9.1 };
+    const rimY = 3.0;
+
     for (const side of [-1, 1] as const) {
       // Pole
       const poleGeo = new THREE.CylinderGeometry(0.06, 0.06, 3.5, 6);
@@ -151,7 +154,7 @@ export default function BasketballScene() {
       const rimGeo = new THREE.TorusGeometry(0.42, 0.035, 6, 12);
       const rimMat = new THREE.MeshLambertMaterial({ color: 0xff4400 });
       const rim = new THREE.Mesh(rimGeo, rimMat);
-      rim.position.set(side * 9.1, 3.0, 0);
+      rim.position.set(side * 9.1, rimY, 0);
       rim.rotation.x = Math.PI / 2;
       scene.add(rim);
 
@@ -167,6 +170,78 @@ export default function BasketballScene() {
       net.position.set(side * 9.1, 2.7, 0);
       scene.add(net);
     }
+
+    // ── Scoreboard ──
+    let scoreLeft = 0;
+    let scoreRight = 0;
+
+    const sbCanvas = document.createElement("canvas");
+    sbCanvas.width = 256;
+    sbCanvas.height = 128;
+    const sbCtx = sbCanvas.getContext("2d")!;
+    const sbTexture = new THREE.CanvasTexture(sbCanvas);
+    sbTexture.minFilter = THREE.NearestFilter;
+    sbTexture.magFilter = THREE.NearestFilter;
+
+    function drawScoreboard() {
+      const ctx = sbCtx;
+      // Background
+      ctx.fillStyle = "#111118";
+      ctx.fillRect(0, 0, 256, 128);
+      // Border
+      ctx.strokeStyle = "#ff6b35";
+      ctx.lineWidth = 3;
+      ctx.strokeRect(2, 2, 252, 124);
+      // Divider
+      ctx.strokeStyle = "#444";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(128, 10);
+      ctx.lineTo(128, 118);
+      ctx.stroke();
+      // Team labels
+      ctx.fillStyle = "#ff4400";
+      ctx.font = "bold 18px monospace";
+      ctx.textAlign = "center";
+      ctx.fillText("HOME", 64, 30);
+      ctx.fillStyle = "#4488ff";
+      ctx.fillText("AWAY", 192, 30);
+      // Scores
+      ctx.fillStyle = "#ffcc88";
+      ctx.font = "bold 52px monospace";
+      ctx.fillText(String(scoreLeft), 64, 88);
+      ctx.fillText(String(scoreRight), 192, 88);
+      sbTexture.needsUpdate = true;
+    }
+    drawScoreboard();
+
+    const sbGeo = new THREE.PlaneGeometry(3.2, 1.6);
+    const sbMat = new THREE.MeshBasicMaterial({
+      map: sbTexture,
+      transparent: true,
+    });
+    const scoreboard = new THREE.Mesh(sbGeo, sbMat);
+    scoreboard.position.set(0, 6.5, -6);
+    scene.add(scoreboard);
+
+    // Scoreboard frame
+    const frameGeo = new THREE.BoxGeometry(3.4, 1.8, 0.08);
+    const frameMat = new THREE.MeshLambertMaterial({ color: 0x333333 });
+    const frame = new THREE.Mesh(frameGeo, frameMat);
+    frame.position.set(0, 6.5, -6.05);
+    scene.add(frame);
+
+    // Scoreboard support poles
+    for (const sx of [-1.4, 1.4]) {
+      const sPoleGeo = new THREE.CylinderGeometry(0.04, 0.04, 2.5, 4);
+      const sPoleMat = new THREE.MeshLambertMaterial({ color: 0x555555 });
+      const sPole = new THREE.Mesh(sPoleGeo, sPoleMat);
+      sPole.position.set(sx, 5.2, -6.05);
+      scene.add(sPole);
+    }
+
+    // Score flash effect (brief glow when scoring)
+    let scoreFlashTime = 0;
 
     // ── Lighting ──
     scene.add(new THREE.AmbientLight(0x404060, 2));
@@ -218,20 +293,100 @@ export default function BasketballScene() {
     const gravity = -0.006;
     const bounceFactor = 0.68;
     let time = 0;
+    let shooting = false;
+    let prevBallY = ball.position.y;
+    let scoreCooldown = 0; // prevent double-counting
 
-    // Click to bounce
-    const handleClick = () => {
-      velY = 0.1 + Math.random() * 0.06;
-      velX += (Math.random() - 0.5) * 0.04;
-      velZ += (Math.random() - 0.5) * 0.03;
+    // ── Raycaster for ball clicks ──
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+
+    const handleClick = (event: MouseEvent) => {
+      const rect = container.getBoundingClientRect();
+      mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObject(ball);
+
+      if (intersects.length > 0) {
+        // Clicked the ball — shoot toward a hoop
+        const targetX =
+          ball.position.x < 0 ? rimPositions.left : rimPositions.right;
+        const dx = targetX - ball.position.x;
+        const dz = 0 - ball.position.z;
+        const dist = Math.sqrt(dx * dx + dz * dz);
+
+        // Compute arc trajectory: horizontal speed and vertical launch
+        const flightTime = dist / 0.18;
+        const neededVelY =
+          (rimY + 1.0 - ball.position.y + 0.5 * 0.006 * flightTime * flightTime) /
+          flightTime;
+
+        velX = dx / flightTime + (Math.random() - 0.5) * 0.01;
+        velZ = dz / flightTime + (Math.random() - 0.5) * 0.01;
+        velY = Math.max(neededVelY, 0.12);
+        shooting = true;
+      } else {
+        // Clicked elsewhere — small bounce
+        velY = 0.1 + Math.random() * 0.06;
+        velX += (Math.random() - 0.5) * 0.04;
+        velZ += (Math.random() - 0.5) * 0.03;
+      }
     };
     container.addEventListener("click", handleClick);
+
+    // ── Score detection helper ──
+    function checkScore() {
+      if (scoreCooldown > 0) {
+        scoreCooldown--;
+        return;
+      }
+
+      // Ball must be falling through the rim
+      if (velY >= 0) return;
+
+      // Check each hoop
+      for (const [side, rimX] of [
+        ["left", rimPositions.left],
+        ["right", rimPositions.right],
+      ] as const) {
+        const dx = ball.position.x - rimX;
+        const dz = ball.position.z - 0;
+        const horizDist = Math.sqrt(dx * dx + dz * dz);
+
+        // Ball within rim radius, crossing rim height downward
+        if (
+          horizDist < 0.42 &&
+          prevBallY >= rimY &&
+          ball.position.y < rimY
+        ) {
+          if (side === "left") {
+            scoreLeft++;
+          } else {
+            scoreRight++;
+          }
+          drawScoreboard();
+          scoreFlashTime = 1.0;
+          scoreCooldown = 60; // ~1 second cooldown
+          shooting = false;
+
+          // Give ball a small downward push through the net
+          velY = -0.04;
+          velX *= 0.3;
+          velZ *= 0.3;
+          break;
+        }
+      }
+    }
 
     // ── Animation loop ──
     let animId: number;
     const animate = () => {
       animId = requestAnimationFrame(animate);
       time += 0.016;
+
+      prevBallY = ball.position.y;
 
       // Ball physics
       velY += gravity;
@@ -244,6 +399,7 @@ export default function BasketballScene() {
         ball.position.y = 0.38;
         velY = Math.abs(velY) * bounceFactor;
         if (velY < 0.008) velY = 0.03;
+        if (shooting) shooting = false;
       }
 
       // Wall bounces
@@ -256,6 +412,23 @@ export default function BasketballScene() {
         ball.position.z = Math.sign(ball.position.z) * 5.5;
       }
 
+      // Backboard collision (ball bouncing off backboard)
+      for (const side of [-1, 1]) {
+        const bbX = side * 9.8;
+        if (
+          Math.abs(ball.position.x - bbX) < 0.3 &&
+          ball.position.y > 2.9 &&
+          ball.position.y < 4.1 &&
+          Math.abs(ball.position.z) < 0.9
+        ) {
+          velX = -velX * 0.6;
+          ball.position.x = bbX - side * 0.3;
+        }
+      }
+
+      // Score detection
+      checkScore();
+
       // Ball rotation
       ball.rotation.x += velX * 3;
       ball.rotation.z -= velZ * 3;
@@ -267,6 +440,19 @@ export default function BasketballScene() {
       shadow.scale.set(shadowScale, shadowScale, 1);
       (shadow.material as THREETypes.MeshBasicMaterial).opacity =
         0.25 * shadowScale;
+
+      // Score flash effect — pulse scoreboard brightness
+      if (scoreFlashTime > 0) {
+        scoreFlashTime -= 0.03;
+        const flash = Math.sin(scoreFlashTime * Math.PI * 6) * 0.3 + 0.7;
+        (sbMat as THREETypes.MeshBasicMaterial).color.setRGB(flash + 0.3, flash + 0.3, flash + 0.3);
+      } else {
+        (sbMat as THREETypes.MeshBasicMaterial).color.setRGB(1, 1, 1);
+      }
+
+      // Scoreboard always faces camera
+      scoreboard.lookAt(camera.position);
+      frame.lookAt(camera.position);
 
       // Gentle camera sway
       camera.position.x = Math.sin(time * 0.12) * 0.8;
@@ -314,7 +500,7 @@ export default function BasketballScene() {
     <div
       ref={containerRef}
       className="absolute inset-0 cursor-pointer"
-      title="Click to bounce the ball!"
+      title="Click the ball to shoot!"
     />
   );
 }
