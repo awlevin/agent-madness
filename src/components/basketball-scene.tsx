@@ -25,8 +25,13 @@ export default function BasketballScene() {
     scene.background = new THREE.Color(0x0a0a14);
     scene.fog = new THREE.FogExp2(0x0a0a14, 0.04);
 
-    const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 100);
-    camera.position.set(0, 6, 12);
+    // On narrow/portrait screens, widen FOV and pull camera up for a better view
+    const aspect = width / height;
+    const fov = aspect < 1 ? 70 : 50;
+    const camY = aspect < 1 ? 9 : 6;
+    const camZ = aspect < 1 ? 10 : 12;
+    const camera = new THREE.PerspectiveCamera(fov, aspect, 0.1, 100);
+    camera.position.set(0, camY, camZ);
     camera.lookAt(0, 0.5, 0);
 
     const renderer = new THREE.WebGLRenderer({ antialias: false });
@@ -297,9 +302,13 @@ export default function BasketballScene() {
     };
 
     // ── Physics ──
+    // On portrait screens, constrain ball to the visible center area
+    const isMobile = aspect < 1;
+    const wallX = isMobile ? 4 : 9.5;
+    const wallZ = isMobile ? 3.5 : 5.5;
     let velY = 0;
-    let velX = 0.025;
-    let velZ = 0.012;
+    let velX = isMobile ? 0.015 : 0.025;
+    let velZ = isMobile ? 0.008 : 0.012;
     const gravity = -0.006;
     const bounceFactor = 0.68;
     let time = 0;
@@ -421,14 +430,14 @@ export default function BasketballScene() {
         if (shooting) shooting = false;
       }
 
-      // Wall bounces
-      if (Math.abs(ball.position.x) > 9.5) {
+      // Wall bounces (tighter on mobile to keep ball visible)
+      if (Math.abs(ball.position.x) > wallX) {
         velX = -velX;
-        ball.position.x = Math.sign(ball.position.x) * 9.5;
+        ball.position.x = Math.sign(ball.position.x) * wallX;
       }
-      if (Math.abs(ball.position.z) > 5.5) {
+      if (Math.abs(ball.position.z) > wallZ) {
         velZ = -velZ;
-        ball.position.z = Math.sign(ball.position.z) * 5.5;
+        ball.position.z = Math.sign(ball.position.z) * wallZ;
       }
 
       // Backboard collision (ball bouncing off backboard)
@@ -474,8 +483,11 @@ export default function BasketballScene() {
       frame.lookAt(camera.position);
 
       // Gentle camera sway
+      const curAspect = container.clientWidth / container.clientHeight;
+      const baseZ = curAspect < 1 ? 10 : 12;
       camera.position.x = Math.sin(time * 0.12) * 0.8;
-      camera.position.z = 12 + Math.cos(time * 0.08) * 0.5;
+      camera.position.z = baseZ + Math.cos(time * 0.08) * 0.5;
+      camera.position.y = curAspect < 1 ? 9 : 6;
       camera.lookAt(0, 0.5, 0);
 
       updateMascots(time);
@@ -488,7 +500,9 @@ export default function BasketballScene() {
     const handleResize = () => {
       const w = container.clientWidth;
       const h = container.clientHeight;
-      camera.aspect = w / h;
+      const a = w / h;
+      camera.aspect = a;
+      camera.fov = a < 1 ? 70 : 50;
       camera.updateProjectionMatrix();
       renderer.setSize(
         Math.floor(w / PIXEL_RATIO),

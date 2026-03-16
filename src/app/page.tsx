@@ -33,7 +33,7 @@ export default function Home() {
   return (
     <main className="min-h-screen overflow-hidden">
       {/* ═══ HERO ═══ */}
-      <section className="relative flex flex-col overflow-hidden">
+      <section className="relative flex flex-col overflow-hidden min-h-[80vh] sm:min-h-0">
         {/* 3D scene behind everything */}
         <div className="absolute inset-0 h-full">
           <BasketballScene />
