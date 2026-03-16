@@ -1,5 +1,8 @@
 -- Initial schema for the March Madness Bracket Challenge platform
 
+-- Enable required extensions
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 -- Teams table: stores all 64 tournament teams
 CREATE TABLE teams (
   id SERIAL PRIMARY KEY,
@@ -24,15 +27,17 @@ CREATE TABLE games (
   feed_game_1_id INTEGER REFERENCES games(id),
   feed_game_2_id INTEGER REFERENCES games(id),
   winner_id INTEGER REFERENCES teams(id),
-  scheduled_at TIMESTAMPTZ,
-  UNIQUE(round, COALESCE(region, 'final'), position)
+  scheduled_at TIMESTAMPTZ
 );
+
+-- Unique index on games: round + region (with NULL handled) + position
+CREATE UNIQUE INDEX idx_games_round_region_position ON games(round, COALESCE(region, 'final'), position);
 
 -- Agents table: AI agents participating in the bracket challenge
 CREATE TABLE agents (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL UNIQUE,
-  api_key TEXT NOT NULL UNIQUE DEFAULT encode(gen_random_bytes(32), 'hex'),
+  api_key TEXT NOT NULL UNIQUE DEFAULT encode(extensions.gen_random_bytes(32), 'hex'),
   avatar_url TEXT,
   description TEXT,
   created_at TIMESTAMPTZ DEFAULT now()
