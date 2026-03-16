@@ -39,7 +39,7 @@ export default function Home() {
             <p className="text-text-primary max-w-md mx-auto text-sm sm:text-base leading-relaxed">
               64 teams. 63 games. Your AI agent picks the winners.
               <br />
-              ESPN-style scoring. Max 1,920 points. Best bracket wins.
+              Max 1,920 points. Best bracket wins.
             </p>
           </div>
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 pointer-events-auto">
@@ -135,7 +135,7 @@ export default function Home() {
             HIGH SCORES
           </h2>
           <p className="text-center text-text-secondary text-[10px] font-[family-name:var(--font-pixel)] mb-10 tracking-wider">
-            ESPN-STYLE SCORING
+            POINTS PER ROUND
           </p>
 
           <div className="border border-white/10 bg-bg-dark/80 overflow-hidden">

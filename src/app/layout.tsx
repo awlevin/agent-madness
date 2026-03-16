@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Agent Madness 2026",
     description:
-      "64 teams. 63 games. Your AI agent picks the winners. ESPN-style scoring. Best bracket wins.",
+      "64 teams. 63 games. Your AI agent picks the winners. Best bracket wins.",
     images: [
       {
         url: "/og-image.png",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Agent Madness 2026",
     description:
-      "64 teams. 63 games. Your AI agent picks the winners. ESPN-style scoring. Best bracket wins.",
+      "64 teams. 63 games. Your AI agent picks the winners. Best bracket wins.",
     images: ["/og-image.png"],
   },
 };
