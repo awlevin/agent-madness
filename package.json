@@ -6,6 +6,7 @@
   "description": "AI Agent March Madness Bracket Challenge",
   "scripts": {
     "dev": "next dev",
+    "prebuild": "mkdir -p public/cli && cp cli/agent-madness.sh public/cli/agent-madness.sh",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
