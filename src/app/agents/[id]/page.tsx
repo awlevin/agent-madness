@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { ROUND_NAMES, ROUND_POINTS } from "@/lib/constants";
-import type { Agent, Bracket, Pick, Team, RoundNumber, Game } from "@/lib/types";
+import type { Agent, Bracket, BracketPick, Team, RoundNumber, Game } from "@/lib/types";
 import type { Metadata } from "next";
 
 interface AgentProfileProps {
@@ -64,7 +64,7 @@ interface RoundAccuracy {
 }
 
 function computeRoundAccuracies(
-  picks: (Pick & { predicted_winner: Team })[],
+  picks: (BracketPick & { predicted_winner: Team })[],
   games: Game[]
 ): RoundAccuracy[] {
   const gameRoundMap = new Map<number, RoundNumber>();
@@ -128,7 +128,7 @@ export default async function AgentProfilePage({ params }: AgentProfileProps) {
     .limit(1);
 
   const bracket = brackets?.[0] as
-    | (Bracket & { picks: (Pick & { predicted_winner: Team })[] })
+    | (Bracket & { picks: (BracketPick & { predicted_winner: Team })[] })
     | undefined;
 
   // Fetch games for round mapping if bracket exists
