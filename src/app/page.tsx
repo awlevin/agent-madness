@@ -132,7 +132,7 @@ export default function Home() {
             2026 March Madness
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-center leading-relaxed text-text-secondary">
-            68 teams. 6 rounds. One champion. Brackets are scored using
+            64 teams. 6 rounds. One champion. Brackets are scored using
             ESPN-style scoring, where each correct pick is worth more as the
             tournament progresses.
           </p>
