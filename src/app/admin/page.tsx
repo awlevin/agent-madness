@@ -1,130 +1,106 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import type { GameWithTeams, RoundNumber } from "@/lib/types";
-import { ROUND_NAMES, TOTAL_GAMES } from "@/lib/constants";
 import GameResultForm from "@/components/game-result-form";
 
-const ROUND_TABS: { round: RoundNumber; label: string }[] = [
-  { round: 1, label: "R64" },
-  { round: 2, label: "R32" },
-  { round: 3, label: "S16" },
-  { round: 4, label: "E8" },
-  { round: 5, label: "F4" },
-  { round: 6, label: "Champ" },
+const ROUND_TABS: { round: RoundNumber; label: string; short: string }[] = [
+  { round: 1, label: "Round of 64", short: "R64" },
+  { round: 2, label: "Round of 32", short: "R32" },
+  { round: 3, label: "Sweet 16", short: "S16" },
+  { round: 4, label: "Elite 8", short: "E8" },
+  { round: 5, label: "Final Four", short: "F4" },
+  { round: 6, label: "Championship", short: "CHP" },
 ];
 
 export default function AdminPage() {
-  const [adminSecret, setAdminSecret] = useState<string | null>(null);
+  const [adminSecret, setAdminSecret] = useState("");
+  const [authenticated, setAuthenticated] = useState(false);
   const [secretInput, setSecretInput] = useState("");
+
   const [games, setGames] = useState<GameWithTeams[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeRound, setActiveRound] = useState<RoundNumber>(1);
 
-  // Check for existing admin secret on mount
-  useEffect(() => {
-    const stored = sessionStorage.getItem("admin_secret");
-    if (stored) {
-      setAdminSecret(stored);
-    } else {
-      setLoading(false);
-    }
-  }, []);
-
   const fetchGames = useCallback(async () => {
     if (!adminSecret) return;
-
     setLoading(true);
     setError(null);
 
     try {
       const res = await fetch("/api/tournament");
+      if (!res.ok) throw new Error(`Failed to fetch tournament data (${res.status})`);
       const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error ?? "Failed to fetch tournament data");
-        setLoading(false);
-        return;
-      }
-
       setGames(data.games ?? []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Network error");
+      setError(err instanceof Error ? err.message : "Failed to load games");
     } finally {
       setLoading(false);
     }
   }, [adminSecret]);
 
-  // Fetch games when admin is authenticated
   useEffect(() => {
-    if (adminSecret) {
+    if (authenticated) {
       fetchGames();
     }
-  }, [adminSecret, fetchGames]);
+  }, [authenticated, fetchGames]);
 
-  function handleSecretSubmit(e: React.FormEvent) {
+  function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     if (!secretInput.trim()) return;
-    sessionStorage.setItem("admin_secret", secretInput.trim());
     setAdminSecret(secretInput.trim());
-    setSecretInput("");
+    setAuthenticated(true);
   }
 
-  function handleLogout() {
-    sessionStorage.removeItem("admin_secret");
-    setAdminSecret(null);
-    setGames([]);
-  }
+  // Compute progress stats
+  const totalGames = games.length;
+  const completedGames = games.filter((g) => g.winner_id !== null).length;
+  const progressPercent = totalGames > 0 ? Math.round((completedGames / totalGames) * 100) : 0;
 
-  // If no admin secret, show the prompt
-  if (!adminSecret) {
+  // Filter games for the active round
+  const filteredGames = games.filter((g) => g.round === activeRound);
+
+  // Per-round completion counts
+  const roundStats = ROUND_TABS.map((tab) => {
+    const roundGames = games.filter((g) => g.round === tab.round);
+    const completed = roundGames.filter((g) => g.winner_id !== null).length;
+    return { ...tab, completed, total: roundGames.length };
+  });
+
+  if (!authenticated) {
     return (
       <main className="flex min-h-screen items-center justify-center px-4">
-        <div className="w-full max-w-sm">
+        <div className="w-full max-w-md">
           <div className="rounded-xl border border-white/10 bg-bg-card p-8">
-            <div className="mb-6 text-center">
-              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-court-orange/10">
-                <svg
-                  className="h-6 w-6 text-court-orange"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
+            <h1 className="text-2xl font-bold text-text-primary">Admin Login</h1>
+            <p className="mt-2 text-sm text-text-secondary">
+              Enter the admin secret to manage tournament results.
+            </p>
+            <form onSubmit={handleLogin} className="mt-6 space-y-4">
+              <div>
+                <label
+                  htmlFor="admin-secret"
+                  className="block text-sm font-medium text-text-secondary"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
-                  />
-                </svg>
+                  Admin Secret
+                </label>
+                <input
+                  id="admin-secret"
+                  type="password"
+                  value={secretInput}
+                  onChange={(e) => setSecretInput(e.target.value)}
+                  placeholder="Enter admin secret..."
+                  className="mt-1.5 w-full rounded-lg border border-white/10 bg-bg-dark px-4 py-2.5 text-sm text-text-primary placeholder:text-text-secondary/50 focus:border-court-orange focus:outline-none focus:ring-1 focus:ring-court-orange"
+                  autoFocus
+                />
               </div>
-              <h1 className="text-xl font-bold text-text-primary">
-                Admin Access
-              </h1>
-              <p className="mt-1 text-sm text-text-secondary">
-                Enter the admin secret to manage game results.
-              </p>
-            </div>
-
-            <form onSubmit={handleSecretSubmit}>
-              <label htmlFor="admin-secret" className="sr-only">
-                Admin Secret
-              </label>
-              <input
-                id="admin-secret"
-                type="password"
-                value={secretInput}
-                onChange={(e) => setSecretInput(e.target.value)}
-                placeholder="Admin secret"
-                className="w-full rounded-lg border border-white/10 bg-bg-dark px-4 py-3 text-sm text-text-primary placeholder:text-text-secondary/50 focus:border-court-orange/50 focus:outline-none focus:ring-1 focus:ring-court-orange/50"
-                autoFocus
-              />
               <button
                 type="submit"
-                className="mt-4 w-full rounded-lg bg-court-orange px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-court-orange/80"
+                disabled={!secretInput.trim()}
+                className="w-full rounded-lg bg-court-orange px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-court-orange/90 disabled:opacity-50"
               >
-                Enter
+                Enter Admin Panel
               </button>
             </form>
           </div>
@@ -133,87 +109,68 @@ export default function AdminPage() {
     );
   }
 
-  const completedGames = games.filter((g) => g.winner_id !== null).length;
-  const roundGames = games.filter(
-    (g) => (g.round as RoundNumber) === activeRound
-  );
-  const roundCompletedGames = roundGames.filter(
-    (g) => g.winner_id !== null
-  ).length;
-
   return (
-    <main className="min-h-screen px-4 py-12 sm:px-6 lg:px-8">
+    <main className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
-        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-text-primary sm:text-4xl">
-              Admin: Game Results
-            </h1>
-            <p className="mt-2 text-text-secondary">
-              Enter game results to score all brackets.
-            </p>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="rounded-lg border border-white/10 bg-bg-card px-4 py-2">
-              <span className="text-sm text-text-secondary">Progress: </span>
-              <span className="text-sm font-semibold text-text-primary">
-                {completedGames} of {TOTAL_GAMES}
-              </span>
-              <span className="text-sm text-text-secondary"> games completed</span>
-            </div>
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="rounded-lg border border-white/10 px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-white/5 hover:text-text-primary"
-            >
-              Logout
-            </button>
-          </div>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-text-primary">
+            Tournament Admin
+          </h1>
+          <p className="mt-1 text-sm text-text-secondary">
+            Enter game results to update the bracket and leaderboard.
+          </p>
         </div>
 
-        {/* Progress bar */}
-        <div className="mb-8">
-          <div className="h-2 w-full overflow-hidden rounded-full bg-white/5">
+        {/* Progress indicator */}
+        <div className="mb-8 rounded-xl border border-white/10 bg-bg-card p-5">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-text-secondary">
+              Tournament Progress
+            </span>
+            <span className="text-sm font-semibold text-court-orange">
+              {completedGames}/{totalGames} games ({progressPercent}%)
+            </span>
+          </div>
+          <div className="mt-3 h-2 overflow-hidden rounded-full bg-bg-dark">
             <div
               className="h-full rounded-full bg-court-orange transition-all duration-500"
-              style={{
-                width: `${TOTAL_GAMES > 0 ? (completedGames / TOTAL_GAMES) * 100 : 0}%`,
-              }}
+              style={{ width: `${progressPercent}%` }}
             />
+          </div>
+          {/* Per-round mini stats */}
+          <div className="mt-3 flex flex-wrap gap-3">
+            {roundStats.map((rs) => (
+              <span key={rs.round} className="text-xs text-text-secondary">
+                {rs.short}: {rs.completed}/{rs.total}
+              </span>
+            ))}
           </div>
         </div>
 
         {/* Round tabs */}
-        <div className="mb-8 flex flex-wrap gap-2">
-          {ROUND_TABS.map(({ round, label }) => {
-            const tabGames = games.filter(
-              (g) => (g.round as RoundNumber) === round
-            );
-            const tabCompleted = tabGames.filter(
-              (g) => g.winner_id !== null
-            ).length;
-            const isActive = activeRound === round;
+        <div className="mb-6 flex flex-wrap gap-1 rounded-lg border border-white/5 bg-bg-card p-1">
+          {ROUND_TABS.map((tab) => {
+            const isActive = activeRound === tab.round;
+            const rs = roundStats.find((r) => r.round === tab.round);
+            const isRoundComplete = rs ? rs.completed === rs.total && rs.total > 0 : false;
 
             return (
               <button
-                key={round}
-                type="button"
-                onClick={() => setActiveRound(round)}
-                className={`relative rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${
+                key={tab.round}
+                onClick={() => setActiveRound(tab.round)}
+                className={[
+                  "flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-colors",
                   isActive
                     ? "bg-court-orange text-white"
-                    : "border border-white/10 bg-bg-card text-text-secondary hover:bg-white/5 hover:text-text-primary"
-                }`}
+                    : "text-text-secondary hover:bg-white/5 hover:text-text-primary",
+                ].join(" ")}
               >
-                <span>{label}</span>
-                {tabGames.length > 0 && (
-                  <span
-                    className={`ml-2 text-xs ${
-                      isActive ? "text-white/70" : "text-text-secondary/70"
-                    }`}
-                  >
-                    {tabCompleted}/{tabGames.length}
+                <span className="hidden sm:inline">{tab.label}</span>
+                <span className="sm:hidden">{tab.short}</span>
+                {isRoundComplete && (
+                  <span className="text-xs text-green-400" title="Round complete">
+                    &#10003;
                   </span>
                 )}
               </button>
@@ -221,16 +178,18 @@ export default function AdminPage() {
           })}
         </div>
 
-        {/* Active round heading */}
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold text-text-primary">
-            {ROUND_NAMES[activeRound]}
-          </h2>
-          <p className="mt-1 text-sm text-text-secondary">
-            {roundCompletedGames} of {roundGames.length} games completed in this
-            round.
-          </p>
-        </div>
+        {/* Error state */}
+        {error && (
+          <div className="mb-6 rounded-lg border border-red-500/30 bg-red-900/20 px-4 py-3 text-sm text-red-400">
+            {error}
+            <button
+              onClick={fetchGames}
+              className="ml-3 underline hover:no-underline"
+            >
+              Retry
+            </button>
+          </div>
+        )}
 
         {/* Loading state */}
         {loading && (
@@ -239,19 +198,19 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* Error state */}
-        {error && !loading && (
-          <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
-            {error}
-          </div>
-        )}
-
-        {/* Game results form */}
-        {!loading && !error && (
+        {/* Game result form */}
+        {!loading && filteredGames.length > 0 && (
           <GameResultForm
-            games={roundGames}
+            games={filteredGames}
+            adminSecret={adminSecret}
             onResultSubmitted={fetchGames}
           />
+        )}
+
+        {!loading && filteredGames.length === 0 && !error && (
+          <div className="py-20 text-center text-text-secondary">
+            No games found for this round.
+          </div>
         )}
       </div>
     </main>
