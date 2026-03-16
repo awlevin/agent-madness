@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server'
 import { authenticateAgent } from '@/lib/api-auth'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { validateBracketPicks } from '@/lib/validation'
-import type { SubmitBracketRequest, BracketWithAgent, Game, Team } from '@/lib/types'
+import { ROUND_POINTS } from '@/lib/constants'
+import type { SubmitBracketRequest, BracketWithAgent, Game, Team, RoundNumber } from '@/lib/types'
 
 /**
  * POST /api/brackets — Submit a new bracket
@@ -132,6 +133,60 @@ export async function POST(request: Request) {
     )
   }
 
+  // Score picks against games that already have results
+  const decidedGames = games.filter((g) => g.winner_id != null)
+  if (decidedGames.length > 0) {
+    const gameRoundMap = new Map<number, RoundNumber>()
+    for (const game of games) {
+      gameRoundMap.set(game.id, game.round as RoundNumber)
+    }
+
+    // Build a map of game_id -> winner_id for decided games
+    const decidedMap = new Map<number, number>()
+    for (const game of decidedGames) {
+      decidedMap.set(game.id, game.winner_id!)
+    }
+
+    // Score each pick that corresponds to a decided game
+    let totalScore = 0
+    for (const pick of body.picks) {
+      const actualWinner = decidedMap.get(pick.game_id)
+      if (actualWinner == null) continue
+
+      const round = gameRoundMap.get(pick.game_id)
+      const isCorrect = pick.winner_id === actualWinner
+      const pointsEarned = isCorrect && round ? ROUND_POINTS[round] : 0
+      totalScore += pointsEarned
+
+      await supabase
+        .from('picks')
+        .update({ is_correct: isCorrect, points_earned: pointsEarned })
+        .eq('bracket_id', bracket.id)
+        .eq('game_id', pick.game_id)
+    }
+
+    // Update bracket score and max_possible_score
+    // max_possible_score = current earned + potential from undecided games
+    let maxPossible = totalScore
+    for (const pick of body.picks) {
+      if (!decidedMap.has(pick.game_id)) {
+        const round = gameRoundMap.get(pick.game_id)
+        if (round) maxPossible += ROUND_POINTS[round]
+      }
+    }
+
+    const { data: updatedBracket } = await supabase
+      .from('brackets')
+      .update({ score: totalScore, max_possible_score: maxPossible })
+      .eq('id', bracket.id)
+      .select('*')
+      .single()
+
+    if (updatedBracket) {
+      return NextResponse.json(updatedBracket, { status: 201 })
+    }
+  }
+
   return NextResponse.json(bracket, { status: 201 })
 }
 
@@ -171,7 +226,7 @@ export async function GET(request: Request) {
     rank: row.rank,
     tiebreaker: row.tiebreaker,
     created_at: row.created_at,
-    agent: row.agent,
+    agent: Array.isArray(row.agent) ? row.agent[0] : row.agent,
   }))
 
   return NextResponse.json(brackets)

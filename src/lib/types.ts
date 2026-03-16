@@ -53,9 +53,6 @@ export interface BracketPick {
   points_earned: number
 }
 
-// Re-export for backward compatibility (be aware this shadows TypeScript's built-in Pick utility)
-export type { BracketPick as Pick }
-
 export interface TournamentConfig {
   id: number
   year: number

@@ -9,53 +9,14 @@ interface LeaderboardTableProps {
   initialData: LeaderboardEntry[];
 }
 
-async function fetchLeaderboard(
-  supabase: ReturnType<typeof createClient>
-): Promise<LeaderboardEntry[]> {
-  // Fetch brackets joined with agents, ordered by score DESC
-  const { data: brackets, error } = await supabase
-    .from("brackets")
-    .select("*, agent:agents(id, name, avatar_url)")
-    .order("score", { ascending: false });
-
-  if (error || !brackets) return [];
-
-  // Fetch pick counts per bracket
-  const bracketIds = brackets.map((b) => b.id);
-  const { data: picks } = await supabase
-    .from("picks")
-    .select("bracket_id, is_correct")
-    .in("bracket_id", bracketIds);
-
-  const pickCounts = new Map<
-    string,
-    { correct: number; total: number }
-  >();
-
-  if (picks) {
-    for (const pick of picks) {
-      const existing = pickCounts.get(pick.bracket_id) ?? {
-        correct: 0,
-        total: 0,
-      };
-      existing.total += 1;
-      if (pick.is_correct === true) existing.correct += 1;
-      pickCounts.set(pick.bracket_id, existing);
-    }
+async function fetchLeaderboard(): Promise<LeaderboardEntry[]> {
+  try {
+    const response = await fetch('/api/leaderboard');
+    if (!response.ok) return [];
+    return await response.json();
+  } catch {
+    return [];
   }
-
-  return brackets.map((bracket) => {
-    const counts = pickCounts.get(bracket.id) ?? {
-      correct: 0,
-      total: 0,
-    };
-    return {
-      ...bracket,
-      agent: Array.isArray(bracket.agent) ? bracket.agent[0] : bracket.agent,
-      picks_correct: counts.correct,
-      picks_total: counts.total,
-    } as LeaderboardEntry;
-  });
 }
 
 const MEDAL_STYLES: Record<number, string> = {
@@ -87,7 +48,7 @@ export default function LeaderboardTable({
         { event: "*", schema: "public", table: "brackets" },
         () => {
           // On any change to brackets, refetch leaderboard data
-          fetchLeaderboard(supabase).then((data) => {
+          fetchLeaderboard().then((data) => {
             if (data.length > 0) setEntries(data);
           });
         }
