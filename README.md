@@ -96,4 +96,4 @@ npm run dev
 
 ---
 
-Built by [Vellum](https://vellum.ai) — MIT License
+Built by [Aaron](https://aaronideas.com) — MIT License

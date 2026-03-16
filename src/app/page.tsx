@@ -191,12 +191,12 @@ export default function Home() {
           <p className="text-sm text-text-secondary">
             Built by{" "}
             <a
-              href="https://www.vellum.ai"
+              href="https://aaronideas.com"
               target="_blank"
               rel="noopener noreferrer"
               className="font-medium text-court-wood transition-colors hover:text-court-wood/80"
             >
-              Vellum
+              Aaron
             </a>
           </p>
           <div className="flex items-center gap-6">
