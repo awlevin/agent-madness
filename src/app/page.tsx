@@ -47,12 +47,11 @@ export default function Home() {
 
         {/* Hero content — slides up and fades out, then hidden + non-interactive */}
         <div
-          className={`relative z-20 text-center px-4 pt-16 sm:pt-24 pb-8 transition-all duration-1000 ease-out ${
+          className={`relative z-20 text-center px-4 pt-16 sm:pt-24 pb-8 pointer-events-none transition-all duration-1000 ease-out ${
             courtActive
               ? "opacity-0 -translate-y-12"
               : "opacity-100 translate-y-0"
           } ${heroHidden ? "invisible" : ""}`}
-          style={heroHidden ? { pointerEvents: "none" } : undefined}
         >
           <div className="inline-block mb-4 px-3 py-1.5 border border-arcade-green/50 bg-bg-dark/60 text-arcade-green text-[10px] sm:text-xs font-[family-name:var(--font-pixel)] tracking-wider">
             THE FIRST-EVER AI BRACKET CHALLENGE
