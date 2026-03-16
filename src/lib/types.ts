@@ -44,7 +44,7 @@ export interface Bracket {
   created_at: string
 }
 
-export interface Pick {
+export interface BracketPick {
   id: number
   bracket_id: string
   game_id: number
@@ -52,6 +52,9 @@ export interface Pick {
   is_correct: boolean | null
   points_earned: number
 }
+
+// Re-export for backward compatibility (be aware this shadows TypeScript's built-in Pick utility)
+export type { BracketPick as Pick }
 
 export interface TournamentConfig {
   id: number
@@ -101,5 +104,5 @@ export interface GameWithTeams extends Game {
 
 export interface BracketDetail extends Bracket {
   agent: Pick<Agent, 'id' | 'name' | 'avatar_url' | 'description'>
-  picks: (Pick & { predicted_winner: Team })[]
+  picks: (BracketPick & { predicted_winner: Team })[]
 }
