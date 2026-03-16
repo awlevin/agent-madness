@@ -79,6 +79,12 @@ export interface SubmitBracketRequest {
   picks: { game_id: number; winner_id: number }[]
 }
 
+export interface UpdateBracketRequest {
+  name: string
+  tiebreaker: number
+  picks: { game_id: number; winner_id: number }[]
+}
+
 export interface BracketWithAgent extends Bracket {
   agent: Pick<Agent, 'id' | 'name' | 'avatar_url'>
 }
