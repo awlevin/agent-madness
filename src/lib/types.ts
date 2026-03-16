@@ -51,6 +51,7 @@ export interface BracketPick {
   predicted_winner_id: number
   is_correct: boolean | null
   points_earned: number
+  predicted_winner?: Team
 }
 
 export interface TournamentConfig {

@@ -80,12 +80,27 @@ export default function BracketGame({
 }: BracketGameProps) {
   const winnerId = game.winner_id;
   const pickedWinnerId = pick?.predicted_winner_id ?? null;
+  const predictedWinner = pick?.predicted_winner ?? null;
 
-  const team1IsPicked = pickedWinnerId !== null && pickedWinnerId === game.team1?.id;
-  const team2IsPicked = pickedWinnerId !== null && pickedWinnerId === game.team2?.id;
+  // Fill in TBD slots with the predicted winner so picks are visible
+  // before matchups are determined
+  let displayTeam1 = game.team1;
+  let displayTeam2 = game.team2;
+  if (predictedWinner) {
+    if (!displayTeam1 && !displayTeam2) {
+      displayTeam1 = predictedWinner;
+    } else if (displayTeam1 && !displayTeam2 && pickedWinnerId !== displayTeam1.id) {
+      displayTeam2 = predictedWinner;
+    } else if (!displayTeam1 && displayTeam2 && pickedWinnerId !== displayTeam2.id) {
+      displayTeam1 = predictedWinner;
+    }
+  }
 
-  const team1IsWinner = winnerId !== null && winnerId === game.team1?.id;
-  const team2IsWinner = winnerId !== null && winnerId === game.team2?.id;
+  const team1IsPicked = pickedWinnerId !== null && pickedWinnerId === displayTeam1?.id;
+  const team2IsPicked = pickedWinnerId !== null && pickedWinnerId === displayTeam2?.id;
+
+  const team1IsWinner = winnerId !== null && winnerId === displayTeam1?.id;
+  const team2IsWinner = winnerId !== null && winnerId === displayTeam2?.id;
 
   const team1IsCorrect = showResult && team1IsPicked && team1IsWinner;
   const team2IsCorrect = showResult && team2IsPicked && team2IsWinner;
@@ -98,7 +113,7 @@ export default function BracketGame({
   return (
     <div className="w-[180px] shrink-0 overflow-hidden rounded-md border border-white/10 bg-bg-card">
       <TeamRow
-        team={game.team1}
+        team={displayTeam1}
         isPicked={team1IsPicked}
         isWinner={team1IsWinner}
         isCorrect={team1IsCorrect}
@@ -107,7 +122,7 @@ export default function BracketGame({
       />
       <div className="border-t border-white/5" />
       <TeamRow
-        team={game.team2}
+        team={displayTeam2}
         isPicked={team2IsPicked}
         isWinner={team2IsWinner}
         isCorrect={team2IsCorrect}
