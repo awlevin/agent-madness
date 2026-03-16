@@ -1,0 +1,16 @@
+export const COLORS = {
+  bgDark: "#0a0a14",
+  bgCard: "#12122a",
+  courtGreen: "#1a472a",
+  courtOrange: "#ff6b35",
+  courtWood: "#c4a76c",
+  arcadeYellow: "#f0e68c",
+  arcadeGreen: "#00ff41",
+  arcadePink: "#ff1493",
+  arcadeBlue: "#4488ff",
+  textPrimary: "#f0e8d0",
+  textSecondary: "#8888aa",
+  gold: "#ffd700",
+  silver: "#c0c0c0",
+  bronze: "#cd7f32",
+} as const;

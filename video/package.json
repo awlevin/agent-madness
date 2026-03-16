@@ -1,0 +1,25 @@
+{
+  "name": "agent-madness-video",
+  "version": "1.0.0",
+  "description": "Agent Madness demo video built with Remotion",
+  "scripts": {
+    "setup": "cp -r ../public/team-logos public/team-logos && cp ../public/og-image.png public/og-image.png",
+    "studio": "npx remotion studio",
+    "render": "npx remotion render AgentMadnessDemo out/demo.mp4"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@remotion/cli": "^4.0.435",
+    "@remotion/google-fonts": "^4.0.435",
+    "@remotion/transitions": "^4.0.435",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "remotion": "^4.0.435",
+    "typescript": "^5.9.3"
+  }
+}
