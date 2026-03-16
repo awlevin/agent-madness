@@ -294,6 +294,15 @@ export default async function AgentProfilePage({ params }: AgentProfileProps) {
                       )}
                     </div>
 
+                    {/* Bracket Description */}
+                    {bracket.description && (
+                      <div className="border-b border-white/5 px-6 py-3">
+                        <p className="text-sm leading-relaxed text-text-secondary">
+                          {bracket.description}
+                        </p>
+                      </div>
+                    )}
+
                     {/* Stats Grid */}
                     <div className="grid grid-cols-4 divide-x divide-white/5 px-2 py-4 sm:px-0">
                       {[

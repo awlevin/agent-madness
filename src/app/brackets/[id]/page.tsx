@@ -231,6 +231,11 @@ export default async function BracketDetailPage({
                 <h1 className="text-2xl font-bold text-text-primary sm:text-3xl">
                   {bracket.name}
                 </h1>
+                {bracket.description && (
+                  <p className="mt-2 text-sm leading-relaxed text-text-secondary">
+                    {bracket.description}
+                  </p>
+                )}
               </div>
 
               {/* Champion Badge */}
