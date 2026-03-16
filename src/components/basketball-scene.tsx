@@ -406,9 +406,9 @@ export default function BasketballScene() {
           ball.position.y < rimY
         ) {
           if (side === "left") {
-            scoreLeft++;
-          } else {
             scoreRight++;
+          } else {
+            scoreLeft++;
           }
           drawScoreboard();
           scoreFlashTime = 1.0;
