@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import type {
   GameWithTeams,
   Team,
-  Pick as BracketPick,
+  BracketPick,
   Region,
   RoundNumber,
 } from "@/lib/types";
