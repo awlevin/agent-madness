@@ -143,7 +143,7 @@ export const WalkthroughBracketView: React.FC = () => {
   // Championship zoom
   const zoomProgress = interpolate(
     frame,
-    [5 * fps, 7 * fps],
+    [3.5 * fps, 5 * fps],
     [0, 1],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
   );
@@ -154,7 +154,7 @@ export const WalkthroughBracketView: React.FC = () => {
   // Championship glow
   const champGlow = interpolate(
     frame,
-    [6.5 * fps, 7.5 * fps],
+    [4.5 * fps, 5.5 * fps],
     [0, 1],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
   );
@@ -247,21 +247,21 @@ export const WalkthroughBracketView: React.FC = () => {
               <div style={{ fontFamily: FONT_PIXEL, fontSize: 10, color: COLORS.arcadeGreen, marginBottom: 4 }}>
                 EAST
               </div>
-              <GameCard seed1={1} team1="Duke" logo1="duke" seed2={16} team2="Siena" logo2="siena" winner={1} delay={0.5} />
-              <GameCard seed1={8} team1="Ohio St" logo1="ohio-st" seed2={9} team2="TCU" logo2="tcu" winner={2} delay={0.8} />
-              <GameCard seed1={5} team1="St John's" logo1="st-johns" seed2={12} team2="N Iowa" logo2="n-iowa" winner={1} delay={1.1} />
-              <GameCard seed1={4} team1="Kansas" logo1="kansas" seed2={13} team2="Cal Bap" logo2="cal-baptist" winner={1} delay={1.4} />
+              <GameCard seed1={1} team1="Duke" logo1="duke" seed2={16} team2="Siena" logo2="siena" winner={1} delay={0.2} />
+              <GameCard seed1={8} team1="Ohio St" logo1="ohio-st" seed2={9} team2="TCU" logo2="tcu" winner={2} delay={0.35} />
+              <GameCard seed1={5} team1="St John's" logo1="st-johns" seed2={12} team2="N Iowa" logo2="n-iowa" winner={1} delay={0.5} />
+              <GameCard seed1={4} team1="Kansas" logo1="kansas" seed2={13} team2="Cal Bap" logo2="cal-baptist" winner={1} delay={0.65} />
             </div>
 
             {/* East R32 */}
             <div style={{ display: "flex", flexDirection: "column", gap: 30, marginTop: 30 }}>
-              <GameCard seed1={1} team1="Duke" logo1="duke" seed2={9} team2="TCU" logo2="tcu" winner={1} delay={1.8} />
-              <GameCard seed1={5} team1="St John's" logo1="st-johns" seed2={4} team2="Kansas" logo2="kansas" winner={2} delay={2.1} />
+              <GameCard seed1={1} team1="Duke" logo1="duke" seed2={9} team2="TCU" logo2="tcu" winner={1} delay={0.9} />
+              <GameCard seed1={5} team1="St John's" logo1="st-johns" seed2={4} team2="Kansas" logo2="kansas" winner={2} delay={1.1} />
             </div>
 
             {/* East S16 */}
             <div style={{ display: "flex", flexDirection: "column", gap: 50, marginTop: 55 }}>
-              <GameCard seed1={1} team1="Duke" logo1="duke" seed2={4} team2="Kansas" logo2="kansas" winner={1} delay={2.5} />
+              <GameCard seed1={1} team1="Duke" logo1="duke" seed2={4} team2="Kansas" logo2="kansas" winner={1} delay={1.4} />
             </div>
 
             {/* Championship */}
@@ -281,7 +281,7 @@ export const WalkthroughBracketView: React.FC = () => {
               <div style={{ fontFamily: FONT_PIXEL, fontSize: 10, color: COLORS.arcadeYellow }}>
                 CHAMPIONSHIP
               </div>
-              <GameCard seed1={1} team1="Duke" logo1="duke" seed2={1} team2="Florida" logo2="florida" winner={1} delay={3.5} />
+              <GameCard seed1={1} team1="Duke" logo1="duke" seed2={1} team2="Florida" logo2="florida" winner={1} delay={2.0} />
               <div
                 style={{
                   fontFamily: FONT_PIXEL,
@@ -298,13 +298,13 @@ export const WalkthroughBracketView: React.FC = () => {
 
             {/* South S16 */}
             <div style={{ display: "flex", flexDirection: "column", gap: 50, marginTop: 55 }}>
-              <GameCard seed1={1} team1="Florida" logo1="florida" seed2={2} team2="Houston" logo2="houston" winner={1} delay={2.8} />
+              <GameCard seed1={1} team1="Florida" logo1="florida" seed2={2} team2="Houston" logo2="houston" winner={1} delay={1.5} />
             </div>
 
             {/* South R32 */}
             <div style={{ display: "flex", flexDirection: "column", gap: 30, marginTop: 30 }}>
-              <GameCard seed1={1} team1="Florida" logo1="florida" seed2={8} team2="Clemson" logo2="clemson" winner={1} delay={2.0} />
-              <GameCard seed1={2} team1="Houston" logo1="houston" seed2={10} team2="Texas AM" logo2="texas-am" winner={1} delay={2.3} />
+              <GameCard seed1={1} team1="Florida" logo1="florida" seed2={8} team2="Clemson" logo2="clemson" winner={1} delay={1.0} />
+              <GameCard seed1={2} team1="Houston" logo1="houston" seed2={10} team2="Texas AM" logo2="texas-am" winner={1} delay={1.2} />
             </div>
 
             {/* South R64 */}
@@ -312,10 +312,10 @@ export const WalkthroughBracketView: React.FC = () => {
               <div style={{ fontFamily: FONT_PIXEL, fontSize: 10, color: COLORS.arcadeGreen, marginBottom: 4 }}>
                 SOUTH
               </div>
-              <GameCard seed1={1} team1="Florida" logo1="florida" seed2={16} team2="PVAMU" logo2="pvamu" winner={1} delay={0.6} />
-              <GameCard seed1={8} team1="Clemson" logo1="clemson" seed2={9} team2="Iowa" logo2="iowa" winner={1} delay={0.9} />
-              <GameCard seed1={2} team1="Houston" logo1="houston" seed2={15} team2="Idaho" logo2="idaho" winner={1} delay={1.2} />
-              <GameCard seed1={10} team1="Texas AM" logo1="texas-am" seed2={7} team2="St Mary's" logo2="st-marys" winner={1} delay={1.5} />
+              <GameCard seed1={1} team1="Florida" logo1="florida" seed2={16} team2="PVAMU" logo2="pvamu" winner={1} delay={0.25} />
+              <GameCard seed1={8} team1="Clemson" logo1="clemson" seed2={9} team2="Iowa" logo2="iowa" winner={1} delay={0.4} />
+              <GameCard seed1={2} team1="Houston" logo1="houston" seed2={15} team2="Idaho" logo2="idaho" winner={1} delay={0.55} />
+              <GameCard seed1={10} team1="Texas AM" logo1="texas-am" seed2={7} team2="St Mary's" logo2="st-marys" winner={1} delay={0.7} />
             </div>
           </div>
         </div>

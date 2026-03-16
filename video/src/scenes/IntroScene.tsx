@@ -16,31 +16,31 @@ export const IntroScene: React.FC = () => {
   const { fps } = useVideoConfig();
 
   // Basketball grid animation - logos fly in from edges
-  const gridOpacity = interpolate(frame, [0, 0.5 * fps], [0, 0.3], {
+  const gridOpacity = interpolate(frame, [0, 0.3 * fps], [0, 0.3], {
     extrapolateRight: "clamp",
   });
 
-  // Title slam-in with spring bounce
+  // Title slam-in with spring bounce — immediate
   const titleScale = spring({
-    frame: frame - Math.floor(0.5 * fps),
+    frame,
     fps,
     config: { damping: 8, stiffness: 200 },
   });
 
-  // Subtitle fade in
+  // Subtitle fade in — fast
   const subtitleOpacity = interpolate(
     frame,
-    [1.5 * fps, 2.2 * fps],
+    [0.6 * fps, 1.0 * fps],
     [0, 1],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
   );
 
-  // Badge slide in
-  const badgeY = interpolate(frame, [2.5 * fps, 3.2 * fps], [60, 0], {
+  // Badge slide in — fast
+  const badgeY = interpolate(frame, [0.3 * fps, 0.7 * fps], [40, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  const badgeOpacity = interpolate(frame, [2.5 * fps, 3.2 * fps], [0, 1], {
+  const badgeOpacity = interpolate(frame, [0.3 * fps, 0.7 * fps], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });

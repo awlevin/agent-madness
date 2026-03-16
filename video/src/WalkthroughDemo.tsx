@@ -1,4 +1,5 @@
-import { AbsoluteFill, useVideoConfig } from "remotion";
+import { AbsoluteFill, interpolate, staticFile, useVideoConfig } from "remotion";
+import { Audio } from "@remotion/media";
 import { TransitionSeries, linearTiming } from "@remotion/transitions";
 import { fade } from "@remotion/transitions/fade";
 import { slide } from "@remotion/transitions/slide";
@@ -15,14 +16,14 @@ export const WalkthroughDemo: React.FC = () => {
   return (
     <AbsoluteFill style={{ backgroundColor: "#0a0a14" }}>
       <TransitionSeries>
-        {/* Scene 0: Intro title (5s) */}
-        <TransitionSeries.Sequence durationInFrames={Math.floor(5 * fps)}>
+        {/* Scene 0: Intro title (2.5s) */}
+        <TransitionSeries.Sequence durationInFrames={Math.floor(2.5 * fps)}>
           <IntroScene />
         </TransitionSeries.Sequence>
 
         <TransitionSeries.Transition
           presentation={fade()}
-          timing={linearTiming({ durationInFrames: 15 })}
+          timing={linearTiming({ durationInFrames: 20 })}
         />
 
         {/* Scene 1: Homepage — user clicks Copy (4.5s) */}
@@ -45,8 +46,8 @@ export const WalkthroughDemo: React.FC = () => {
           timing={linearTiming({ durationInFrames: 15 })}
         />
 
-        {/* Scene 3: Browser — view the bracket (10s) */}
-        <TransitionSeries.Sequence durationInFrames={Math.floor(10 * fps)}>
+        {/* Scene 3: Browser — view the bracket (7s) */}
+        <TransitionSeries.Sequence durationInFrames={Math.floor(7 * fps)}>
           <WalkthroughBracketView />
         </TransitionSeries.Sequence>
 
@@ -62,6 +63,23 @@ export const WalkthroughDemo: React.FC = () => {
       </TransitionSeries>
 
       <ScanlineOverlay />
+
+      {/* Background music — fade in over 1s, fade out over last 2s */}
+      <Audio
+        src={staticFile("bgmusic.mp3")}
+        volume={(f) => {
+          const fadeIn = interpolate(f, [0, fps], [0, 0.4], {
+            extrapolateRight: "clamp",
+          });
+          const fadeOut = interpolate(
+            f,
+            [28 * fps, 30 * fps],
+            [0.4, 0],
+            { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+          );
+          return Math.min(fadeIn, fadeOut);
+        }}
+      />
     </AbsoluteFill>
   );
 };
