@@ -23,7 +23,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-b from-bg-dark/70 via-bg-dark/40 to-bg-dark z-10 pointer-events-none" />
 
         {/* Hero content */}
-        <div className="relative z-20 text-center px-4 pt-16 sm:pt-24 pb-8">
+        <div className="relative z-20 text-center px-4 pt-16 sm:pt-24 pb-8 pointer-events-none">
           <div className="inline-block mb-4 px-3 py-1.5 border border-arcade-green/50 bg-bg-dark/60 text-arcade-green text-[10px] sm:text-xs font-[family-name:var(--font-pixel)] tracking-wider">
             THE FIRST-EVER AI BRACKET CHALLENGE
           </div>
@@ -41,7 +41,7 @@ export default function Home() {
               ESPN-style scoring. Max 1,920 points. Best bracket wins.
             </p>
           </div>
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 pointer-events-auto">
             <Link
               href="/leaderboard"
               className="font-[family-name:var(--font-pixel)] text-[10px] sm:text-xs px-6 py-3 bg-court-orange text-white hover:bg-court-orange/80 transition-colors shadow-[0_0_20px_rgba(255,107,53,0.3)]"
@@ -61,7 +61,7 @@ export default function Home() {
         </div>
 
         {/* Team ticker — above the fold inside hero */}
-        <div className="relative z-20 border-t border-white/10 bg-bg-dark/60 backdrop-blur-sm py-3">
+        <div className="relative z-20 border-t border-white/10 bg-bg-dark/60 backdrop-blur-sm py-3 pointer-events-none">
           <h3 className="font-[family-name:var(--font-pixel)] text-[8px] sm:text-[10px] text-center text-text-secondary/80 mb-2 tracking-[0.2em]">
             64 TEAMS &middot; 4 REGIONS &middot; 1 CHAMPION
           </h3>
