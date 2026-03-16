@@ -287,7 +287,7 @@ export default function BasketballScene() {
     scene.add(shadow);
 
     // ── Big 10 Mascots (hidden by default) ──
-    const { mascotsGroup, update: updateMascots } = createMascots(THREE);
+    const { mascotsGroup, mascotGroups, triggerJump, update: updateMascots } = createMascots(THREE);
     mascotsGroup.visible = false;
     scene.add(mascotsGroup);
 
@@ -372,10 +372,25 @@ export default function BasketballScene() {
         }
         shooting = true;
       } else {
-        // Clicked elsewhere — small bounce
-        velY = 0.1 + Math.random() * 0.06;
-        velX += (Math.random() - 0.5) * 0.04;
-        velZ += (Math.random() - 0.5) * 0.03;
+        // Check if a mascot was clicked
+        let clickedMascot = false;
+        if (mascotsGroup.visible) {
+          for (const mg of mascotGroups) {
+            const hits = raycaster.intersectObjects(mg.children, true);
+            if (hits.length > 0) {
+              triggerJump(mg);
+              clickedMascot = true;
+              break;
+            }
+          }
+        }
+
+        if (!clickedMascot) {
+          // Clicked elsewhere — small bounce
+          velY = 0.1 + Math.random() * 0.06;
+          velX += (Math.random() - 0.5) * 0.04;
+          velZ += (Math.random() - 0.5) * 0.03;
+        }
       }
     };
     container.addEventListener("click", handleClick);

@@ -32,6 +32,7 @@ interface MascotInstance {
   animation: AnimationType;
   offset: number;
   originX: number;
+  jumpTime: number; // >0 means currently jumping from a click
 }
 
 // 8 Big Ten mascots with their school colors
@@ -496,6 +497,7 @@ function buildFigure(
     animation: cfg.animation,
     offset: Math.random() * Math.PI * 2,
     originX: cfg.position[0],
+    jumpTime: 0,
   };
 }
 
@@ -578,6 +580,9 @@ const ANIM_FN: Record<AnimationType, (t: number, m: MascotInstance) => void> = {
   running: animRunning,
 };
 
+const JUMP_DURATION = 0.5; // seconds
+const JUMP_HEIGHT = 1.2;
+
 export function createMascots(THREE: THREELib) {
   const root = new THREE.Group();
   const mascots: MascotInstance[] = [];
@@ -590,9 +595,28 @@ export function createMascots(THREE: THREELib) {
 
   return {
     mascotsGroup: root,
+    /** All mascot groups — use for raycasting click targets */
+    mascotGroups: mascots.map((m) => m.group),
+    /** Trigger a jump on the mascot whose group matches */
+    triggerJump(group: THREETypes.Object3D) {
+      for (const m of mascots) {
+        if (m.group === group) {
+          m.jumpTime = JUMP_DURATION;
+          break;
+        }
+      }
+    },
     update(time: number) {
+      const dt = 0.016; // ~60 fps frame time
       for (const m of mascots) {
         ANIM_FN[m.animation](time + m.offset, m);
+        // Layer click-jump on top of animation
+        if (m.jumpTime > 0) {
+          const progress = 1 - m.jumpTime / JUMP_DURATION; // 0 → 1
+          const jumpY = Math.sin(progress * Math.PI) * JUMP_HEIGHT;
+          m.group.position.y += jumpY;
+          m.jumpTime = Math.max(0, m.jumpTime - dt);
+        }
       }
     },
   };
