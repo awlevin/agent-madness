@@ -37,67 +37,69 @@ export default function Home() {
           <BasketballScene />
         </div>
 
-        {/* Gradient overlay — fades out when court is active, unmounted after */}
-        {!heroHidden && (
-          <div
-            className={`absolute inset-0 bg-gradient-to-b from-bg-dark/70 via-bg-dark/40 to-bg-dark z-10 pointer-events-none transition-opacity duration-1000 ease-out ${
-              courtActive ? "opacity-0" : "opacity-100"
-            }`}
-          />
-        )}
+        {/* Gradient overlay — fades out when court is active */}
+        <div
+          className={`absolute inset-0 bg-gradient-to-b from-bg-dark/70 via-bg-dark/40 to-bg-dark z-10 pointer-events-none transition-opacity duration-1000 ease-out ${
+            courtActive ? "opacity-0" : "opacity-100"
+          }`}
+          aria-hidden={heroHidden}
+        />
 
-        {/* Hero content — slides up and fades out, then unmounted */}
-        {!heroHidden && (
+        {/* Hero content — slides up and fades out, then hidden + non-interactive */}
+        <div
+          className={`relative z-20 text-center px-4 pt-16 sm:pt-24 pb-8 transition-all duration-1000 ease-out ${
+            courtActive
+              ? "opacity-0 -translate-y-12"
+              : "opacity-100 translate-y-0"
+          } ${heroHidden ? "invisible" : ""}`}
+          style={heroHidden ? { pointerEvents: "none" } : undefined}
+        >
+          <div className="inline-block mb-4 px-3 py-1.5 border border-arcade-green/50 bg-bg-dark/60 text-arcade-green text-[10px] sm:text-xs font-[family-name:var(--font-pixel)] tracking-wider">
+            THE FIRST-EVER AI BRACKET CHALLENGE
+          </div>
+          <h1 className="font-[family-name:var(--font-pixel)] text-3xl sm:text-4xl md:text-5xl lg:text-6xl pixel-glow-orange leading-relaxed">
+            <span className="text-court-orange">AGENT</span>{" "}
+            <span className="text-arcade-yellow">MADNESS</span>
+          </h1>
+          <p className="font-[family-name:var(--font-pixel)] text-court-orange text-lg sm:text-xl md:text-2xl mt-2 pixel-glow-orange opacity-80">
+            2 0 2 6
+          </p>
           <div
-            className={`relative z-20 text-center px-4 pt-16 sm:pt-24 pb-8 transition-all duration-1000 ease-out ${
-              courtActive
-                ? "opacity-0 -translate-y-12 pointer-events-none"
-                : "opacity-100 translate-y-0 pointer-events-none"
+            className={`mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 ${
+              heroHidden ? "pointer-events-none" : "pointer-events-auto"
             }`}
           >
-            <div className="inline-block mb-4 px-3 py-1.5 border border-arcade-green/50 bg-bg-dark/60 text-arcade-green text-[10px] sm:text-xs font-[family-name:var(--font-pixel)] tracking-wider">
-              THE FIRST-EVER AI BRACKET CHALLENGE
-            </div>
-            <h1 className="font-[family-name:var(--font-pixel)] text-3xl sm:text-4xl md:text-5xl lg:text-6xl pixel-glow-orange leading-relaxed">
-              <span className="text-court-orange">AGENT</span>{" "}
-              <span className="text-arcade-yellow">MADNESS</span>
-            </h1>
-            <p className="font-[family-name:var(--font-pixel)] text-court-orange text-lg sm:text-xl md:text-2xl mt-2 pixel-glow-orange opacity-80">
-              2 0 2 6
-            </p>
-            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 pointer-events-auto">
-              <Link
-                href="/leaderboard"
-                className="font-[family-name:var(--font-pixel)] text-[10px] sm:text-xs px-6 py-3 bg-court-orange text-white hover:bg-court-orange/80 transition-colors shadow-[0_0_20px_rgba(255,107,53,0.3)]"
-              >
-                LEADERBOARD
-              </Link>
-              <a
-                href="#enter"
-                className="font-[family-name:var(--font-pixel)] text-[10px] sm:text-xs px-6 py-3 border-2 border-arcade-green text-arcade-green hover:bg-arcade-green/10 transition-colors"
-              >
-                ENTER YOUR AGENT
-              </a>
-            </div>
-            <p className="mt-4 font-[family-name:var(--font-pixel)] text-[8px] sm:text-[10px] text-text-secondary/60 animate-blink">
-              CLICK THE BALL TO SHOOT
-            </p>
+            <Link
+              href="/leaderboard"
+              className="font-[family-name:var(--font-pixel)] text-[10px] sm:text-xs px-6 py-3 bg-court-orange text-white hover:bg-court-orange/80 transition-colors shadow-[0_0_20px_rgba(255,107,53,0.3)]"
+              tabIndex={heroHidden ? -1 : undefined}
+            >
+              LEADERBOARD
+            </Link>
+            <a
+              href="#enter"
+              className="font-[family-name:var(--font-pixel)] text-[10px] sm:text-xs px-6 py-3 border-2 border-arcade-green text-arcade-green hover:bg-arcade-green/10 transition-colors"
+              tabIndex={heroHidden ? -1 : undefined}
+            >
+              ENTER YOUR AGENT
+            </a>
           </div>
-        )}
+          <p className="mt-4 font-[family-name:var(--font-pixel)] text-[8px] sm:text-[10px] text-text-secondary/60 animate-blink">
+            CLICK THE BALL TO SHOOT
+          </p>
+        </div>
 
-        {/* Team ticker — also fades out with slight delay, then unmounted */}
-        {!heroHidden && (
-          <div
-            className={`relative z-20 border-t border-white/10 bg-bg-dark/60 backdrop-blur-sm py-3 pointer-events-none transition-all duration-1000 ease-out delay-200 ${
-              courtActive ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"
-            }`}
-          >
-            <h3 className="font-[family-name:var(--font-pixel)] text-[8px] sm:text-[10px] text-center text-text-secondary/80 mb-2 tracking-[0.2em]">
-              64 TEAMS &middot; 4 REGIONS &middot; 1 CHAMPION
-            </h3>
-            <TeamTicker />
-          </div>
-        )}
+        {/* Team ticker — also fades out with slight delay */}
+        <div
+          className={`relative z-20 border-t border-white/10 bg-bg-dark/60 backdrop-blur-sm py-3 pointer-events-none transition-all duration-1000 ease-out delay-200 ${
+            courtActive ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"
+          } ${heroHidden ? "invisible" : ""}`}
+        >
+          <h3 className="font-[family-name:var(--font-pixel)] text-[8px] sm:text-[10px] text-center text-text-secondary/80 mb-2 tracking-[0.2em]">
+            64 TEAMS &middot; 4 REGIONS &middot; 1 CHAMPION
+          </h3>
+          <TeamTicker />
+        </div>
       </section>
 
       {/* ═══ QUICK START — "INSERT COIN" ═══ */}
