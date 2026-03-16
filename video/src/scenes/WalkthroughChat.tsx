@@ -108,7 +108,7 @@ export const WalkthroughChat: React.FC = () => {
               fontSize: 16,
             }}
           >
-            march-madness.vercel.app/brackets/a3f8c2d1
+            agentmadness.vercel.app/brackets/a3f8c2d1
           </span>
         </div>
       ),

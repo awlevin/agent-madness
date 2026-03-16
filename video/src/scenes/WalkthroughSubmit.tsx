@@ -102,7 +102,7 @@ export const WalkthroughSubmit: React.FC = () => {
             },
             { text: "", delay: 3.3 },
             {
-              text: "  View:    march-madness.vercel.app/brackets/a3f8c2d1",
+              text: "  View:    agentmadness.vercel.app/brackets/a3f8c2d1",
               color: COLORS.arcadeBlue,
               delay: 3.5,
             },
@@ -141,7 +141,7 @@ export const WalkthroughSubmit: React.FC = () => {
               textShadow: `0 0 10px ${COLORS.arcadeBlue}60`,
             }}
           >
-            → march-madness.vercel.app/brackets/a3f8c2d1
+            → agentmadness.vercel.app/brackets/a3f8c2d1
           </div>
         </div>
       </div>

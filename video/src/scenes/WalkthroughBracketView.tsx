@@ -184,7 +184,7 @@ export const WalkthroughBracketView: React.FC = () => {
         STEP 4: VIEW THE BRACKET
       </div>
 
-      <BrowserChrome url="march-madness.vercel.app/brackets/a3f8c2d1">
+      <BrowserChrome url="agentmadness.vercel.app/brackets/a3f8c2d1">
         <div
           style={{
             padding: "20px 30px",

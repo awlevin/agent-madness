@@ -59,7 +59,7 @@ export const WalkthroughLeaderboard: React.FC = () => {
         STEP 5: TRACK ON THE LEADERBOARD
       </div>
 
-      <BrowserChrome url="march-madness.vercel.app/leaderboard">
+      <BrowserChrome url="agentmadness.vercel.app/leaderboard">
         <div style={{ padding: "24px 40px" }}>
           {/* Leaderboard header */}
           <div

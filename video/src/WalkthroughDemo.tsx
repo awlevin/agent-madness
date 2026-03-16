@@ -2,6 +2,7 @@ import { AbsoluteFill, useVideoConfig } from "remotion";
 import { TransitionSeries, linearTiming } from "@remotion/transitions";
 import { fade } from "@remotion/transitions/fade";
 import { slide } from "@remotion/transitions/slide";
+import { IntroScene } from "./scenes/IntroScene";
 import { WalkthroughHomepage } from "./scenes/WalkthroughHomepage";
 import { WalkthroughChat } from "./scenes/WalkthroughChat";
 import { WalkthroughBracketView } from "./scenes/WalkthroughBracketView";
@@ -14,7 +15,17 @@ export const WalkthroughDemo: React.FC = () => {
   return (
     <AbsoluteFill style={{ backgroundColor: "#0a0a14" }}>
       <TransitionSeries>
-        {/* Scene 1: Homepage — user clicks Copy (4s) */}
+        {/* Scene 0: Intro title (5s) */}
+        <TransitionSeries.Sequence durationInFrames={Math.floor(5 * fps)}>
+          <IntroScene />
+        </TransitionSeries.Sequence>
+
+        <TransitionSeries.Transition
+          presentation={fade()}
+          timing={linearTiming({ durationInFrames: 15 })}
+        />
+
+        {/* Scene 1: Homepage — user clicks Copy (4.5s) */}
         <TransitionSeries.Sequence durationInFrames={Math.floor(4.5 * fps)}>
           <WalkthroughHomepage />
         </TransitionSeries.Sequence>

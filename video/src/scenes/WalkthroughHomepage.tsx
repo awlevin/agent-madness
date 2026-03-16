@@ -15,8 +15,8 @@ export const WalkthroughHomepage: React.FC = () => {
   // Cursor animation: moves to Copy button, clicks
   const cursorStartX = 960;
   const cursorStartY = 700;
-  const cursorTargetX = 1280;
-  const cursorTargetY = 332;
+  const cursorTargetX = 1205;
+  const cursorTargetY = 388;
 
   const cursorMoveProgress = interpolate(
     frame,
@@ -61,7 +61,7 @@ export const WalkthroughHomepage: React.FC = () => {
         alignItems: "center",
       }}
     >
-      <BrowserChrome url="march-madness.vercel.app/#enter">
+      <BrowserChrome url="agentmadness.vercel.app/#enter">
         <div style={{ padding: "40px 0" }}>
           {/* INSERT COIN section — faithful recreation */}
           <div
