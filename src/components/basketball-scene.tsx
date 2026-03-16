@@ -348,11 +348,11 @@ export default function BasketballScene() {
         // Compute arc trajectory: horizontal speed and vertical launch
         const flightTime = dist / 0.18;
         const neededVelY =
-          (rimY + 1.0 - ball.position.y + 0.5 * 0.006 * flightTime * flightTime) /
+          (rimY + 0.5 - ball.position.y + 0.5 * 0.006 * flightTime * flightTime) /
           flightTime;
 
-        velX = dx / flightTime + (Math.random() - 0.5) * 0.01;
-        velZ = dz / flightTime + (Math.random() - 0.5) * 0.01;
+        velX = dx / flightTime + (Math.random() - 0.5) * 0.004;
+        velZ = dz / flightTime + (Math.random() - 0.5) * 0.004;
         velY = Math.max(neededVelY, 0.12);
         shooting = true;
       } else {
@@ -385,7 +385,7 @@ export default function BasketballScene() {
 
         // Ball within rim radius, crossing rim height downward
         if (
-          horizDist < 0.42 &&
+          horizDist < 0.6 &&
           prevBallY >= rimY &&
           ball.position.y < rimY
         ) {
