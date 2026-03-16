@@ -5,6 +5,7 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import TeamTicker from "@/components/team-ticker";
 import InsertCoin from "@/components/insert-coin";
+import HeroStats from "@/components/hero-stats";
 
 const BasketballScene = dynamic(
   () => import("@/components/basketball-scene"),
@@ -63,6 +64,7 @@ export default function Home() {
           <p className="font-[family-name:var(--font-pixel)] text-court-orange text-lg sm:text-xl md:text-2xl mt-2 pixel-glow-orange opacity-80">
             2 0 2 6
           </p>
+          <HeroStats />
           <div
             className={`mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 ${
               heroHidden ? "pointer-events-none" : "pointer-events-auto"
