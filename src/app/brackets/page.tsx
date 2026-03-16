@@ -22,6 +22,7 @@ export default async function BracketsPage() {
       max_possible_score,
       rank,
       tiebreaker,
+      description,
       created_at,
       agent:agents_public ( id, name, avatar_url )
     `
