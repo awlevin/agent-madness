@@ -176,8 +176,8 @@ export default function BasketballScene() {
     let scoreRight = 0;
 
     const sbCanvas = document.createElement("canvas");
-    sbCanvas.width = 256;
-    sbCanvas.height = 128;
+    sbCanvas.width = 512;
+    sbCanvas.height = 256;
     const sbCtx = sbCanvas.getContext("2d")!;
     const sbTexture = new THREE.CanvasTexture(sbCanvas);
     sbTexture.minFilter = THREE.NearestFilter;
@@ -185,59 +185,65 @@ export default function BasketballScene() {
 
     function drawScoreboard() {
       const ctx = sbCtx;
-      // Background
-      ctx.fillStyle = "#111118";
-      ctx.fillRect(0, 0, 256, 128);
-      // Border
+      const w = 512;
+      const h = 256;
+      // Background — darker for contrast
+      ctx.fillStyle = "#0a0a12";
+      ctx.fillRect(0, 0, w, h);
+      // Outer border glow
+      ctx.strokeStyle = "#ff6b35";
+      ctx.lineWidth = 6;
+      ctx.strokeRect(4, 4, w - 8, h - 8);
+      // Inner border
+      ctx.strokeStyle = "#ff6b35";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(12, 12, w - 24, h - 24);
+      // Divider
       ctx.strokeStyle = "#ff6b35";
       ctx.lineWidth = 3;
-      ctx.strokeRect(2, 2, 252, 124);
-      // Divider
-      ctx.strokeStyle = "#444";
-      ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.moveTo(128, 10);
-      ctx.lineTo(128, 118);
+      ctx.moveTo(w / 2, 20);
+      ctx.lineTo(w / 2, h - 20);
       ctx.stroke();
       // Team labels
-      ctx.fillStyle = "#ff4400";
-      ctx.font = "bold 18px monospace";
+      ctx.fillStyle = "#ff6644";
+      ctx.font = "bold 36px monospace";
       ctx.textAlign = "center";
-      ctx.fillText("HOME", 64, 30);
-      ctx.fillStyle = "#4488ff";
-      ctx.fillText("AWAY", 192, 30);
-      // Scores
-      ctx.fillStyle = "#ffcc88";
-      ctx.font = "bold 52px monospace";
-      ctx.fillText(String(scoreLeft), 64, 88);
-      ctx.fillText(String(scoreRight), 192, 88);
+      ctx.fillText("HOME", w / 4, 60);
+      ctx.fillStyle = "#66aaff";
+      ctx.fillText("AWAY", (3 * w) / 4, 60);
+      // Scores — large and bright
+      ctx.fillStyle = "#ffeecc";
+      ctx.font = "bold 100px monospace";
+      ctx.fillText(String(scoreLeft), w / 4, 175);
+      ctx.fillText(String(scoreRight), (3 * w) / 4, 175);
       sbTexture.needsUpdate = true;
     }
     drawScoreboard();
 
-    const sbGeo = new THREE.PlaneGeometry(3.2, 1.6);
+    const sbGeo = new THREE.PlaneGeometry(2.8, 1.4);
     const sbMat = new THREE.MeshBasicMaterial({
       map: sbTexture,
-      transparent: true,
+      fog: false,
     });
     const scoreboard = new THREE.Mesh(sbGeo, sbMat);
-    scoreboard.position.set(0, 6.5, -6);
+    scoreboard.position.set(0, 5.0, -3);
     scene.add(scoreboard);
 
     // Scoreboard frame
-    const frameGeo = new THREE.BoxGeometry(3.4, 1.8, 0.08);
-    const frameMat = new THREE.MeshLambertMaterial({ color: 0x333333 });
+    const frameGeo = new THREE.BoxGeometry(3.0, 1.6, 0.1);
+    const frameMat = new THREE.MeshBasicMaterial({ color: 0x222222, fog: false });
     const frame = new THREE.Mesh(frameGeo, frameMat);
-    frame.position.set(0, 6.5, -6.05);
+    frame.position.set(0, 5.0, -3.06);
     scene.add(frame);
 
-    // Scoreboard support poles
-    for (const sx of [-1.4, 1.4]) {
-      const sPoleGeo = new THREE.CylinderGeometry(0.04, 0.04, 2.5, 4);
-      const sPoleMat = new THREE.MeshLambertMaterial({ color: 0x555555 });
-      const sPole = new THREE.Mesh(sPoleGeo, sPoleMat);
-      sPole.position.set(sx, 5.2, -6.05);
-      scene.add(sPole);
+    // Scoreboard support wires (thin lines hanging from above)
+    for (const sx of [-1.2, 1.2]) {
+      const wireGeo = new THREE.CylinderGeometry(0.02, 0.02, 2.5, 3);
+      const wireMat = new THREE.MeshBasicMaterial({ color: 0x444444, fog: false });
+      const wire = new THREE.Mesh(wireGeo, wireMat);
+      wire.position.set(sx, 6.3, -3.06);
+      scene.add(wire);
     }
 
     // Score flash effect (brief glow when scoring)
