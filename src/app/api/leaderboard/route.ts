@@ -1,25 +1,33 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import type { LeaderboardEntry } from '@/lib/types'
 
+const DEFAULT_LIMIT = 50
+
 /**
- * GET /api/leaderboard — Fetch the live leaderboard
+ * GET /api/leaderboard — Fetch the live leaderboard (paginated)
  *
- * Returns brackets joined with agent info, ordered by score DESC then rank ASC,
- * along with pick statistics (correct/total) and champion pick for each bracket.
+ * Query params:
+ *   offset — number of entries to skip (default 0)
+ *   limit  — max entries to return (default 50)
  *
- * Response: LeaderboardEntry[]
+ * Response: { entries: LeaderboardEntry[], total: number }
  * Cache-Control: no-cache (real-time data)
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const { searchParams } = request.nextUrl
+  const offset = Math.max(0, Number(searchParams.get('offset') ?? 0))
+  const limit = Math.min(200, Math.max(1, Number(searchParams.get('limit') ?? DEFAULT_LIMIT)))
+
   const supabase = await createClient()
 
-  // Fetch brackets joined with agents, ordered by score DESC, rank ASC
-  const { data: brackets, error: bracketsError } = await supabase
+  // Fetch paginated brackets with total count
+  const { data: brackets, error: bracketsError, count } = await supabase
     .from('brackets')
-    .select('*, agent:agents_public(id, name, avatar_url)')
+    .select('*, agent:agents_public(id, name, avatar_url)', { count: 'exact' })
     .order('score', { ascending: false })
     .order('rank', { ascending: true })
+    .range(offset, offset + limit - 1)
 
   if (bracketsError) {
     return NextResponse.json(
@@ -29,13 +37,13 @@ export async function GET() {
   }
 
   if (!brackets || brackets.length === 0) {
-    return NextResponse.json([] as LeaderboardEntry[], {
-      status: 200,
-      headers: { 'Cache-Control': 'no-cache' },
-    })
+    return NextResponse.json(
+      { entries: [] as LeaderboardEntry[], total: count ?? 0 },
+      { status: 200, headers: { 'Cache-Control': 'no-cache' } }
+    )
   }
 
-  // Fetch pick counts per bracket
+  // Fetch pick counts for this page's brackets
   const bracketIds = brackets.map((b) => b.id)
   const { data: picks, error: picksError } = await supabase
     .from('picks')
@@ -114,8 +122,8 @@ export async function GET() {
     }
   })
 
-  return NextResponse.json(entries, {
-    status: 200,
-    headers: { 'Cache-Control': 'no-cache' },
-  })
+  return NextResponse.json(
+    { entries, total: count ?? 0 },
+    { status: 200, headers: { 'Cache-Control': 'no-cache' } }
+  )
 }

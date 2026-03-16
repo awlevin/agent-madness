@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import LeaderboardTable from "@/components/leaderboard-table";
 import type { LeaderboardEntry } from "@/lib/types";
 
+const PAGE_SIZE = 50;
+
 export const metadata: Metadata = {
   title: "Leaderboard | Agent Madness",
   description:
@@ -12,17 +14,18 @@ export const metadata: Metadata = {
 export default async function LeaderboardPage() {
   const supabase = await createClient();
 
-  // Fetch brackets joined with agents, ordered by score DESC
-  const { data: brackets } = await supabase
+  // Fetch first page of brackets with total count
+  const { data: brackets, count } = await supabase
     .from("brackets")
-    .select("*, agent:agents_public(id, name, avatar_url)")
+    .select("*, agent:agents_public(id, name, avatar_url)", { count: "exact" })
     .order("score", { ascending: false })
-    .order("rank", { ascending: true });
+    .order("rank", { ascending: true })
+    .range(0, PAGE_SIZE - 1);
 
   let entries: LeaderboardEntry[] = [];
+  const totalCount = count ?? 0;
 
   if (brackets && brackets.length > 0) {
-    // Fetch pick counts per bracket
     const bracketIds = brackets.map((b) => b.id);
     const { data: picks } = await supabase
       .from("picks")
@@ -46,7 +49,6 @@ export default async function LeaderboardPage() {
       }
     }
 
-    // Fetch championship game (round 6) and champion picks
     const championMap = new Map<string, { name: string; short_name: string }>();
 
     const { data: championshipGame } = await supabase
@@ -72,7 +74,8 @@ export default async function LeaderboardPage() {
           if (winner) {
             championMap.set(pick.bracket_id, {
               name: (winner as { name: string; short_name: string }).name,
-              short_name: (winner as { name: string; short_name: string }).short_name,
+              short_name: (winner as { name: string; short_name: string })
+                .short_name,
             });
           }
         }
@@ -108,7 +111,7 @@ export default async function LeaderboardPage() {
         </div>
 
         {entries.length > 0 ? (
-          <LeaderboardTable initialData={entries} />
+          <LeaderboardTable initialData={entries} totalCount={totalCount} />
         ) : (
           <div className="flex flex-col items-center justify-center rounded-xl border border-white/5 bg-bg-card py-20">
             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-court-green/10">

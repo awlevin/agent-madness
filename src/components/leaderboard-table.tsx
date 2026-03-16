@@ -1,22 +1,30 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { getTeamLogoPath } from "@/lib/team-logos";
 import type { LeaderboardEntry } from "@/lib/types";
 
+const PAGE_SIZE = 50;
+
 interface LeaderboardTableProps {
   initialData: LeaderboardEntry[];
+  totalCount: number;
 }
 
-async function fetchLeaderboard(): Promise<LeaderboardEntry[]> {
+async function fetchLeaderboardPage(
+  offset: number,
+  limit: number
+): Promise<{ entries: LeaderboardEntry[]; total: number }> {
   try {
-    const response = await fetch("/api/leaderboard");
-    if (!response.ok) return [];
+    const response = await fetch(
+      `/api/leaderboard?offset=${offset}&limit=${limit}`
+    );
+    if (!response.ok) return { entries: [], total: 0 };
     return await response.json();
   } catch {
-    return [];
+    return { entries: [], total: 0 };
   }
 }
 
@@ -40,8 +48,51 @@ const MEDAL_TEXT: Record<number, string> = {
 
 export default function LeaderboardTable({
   initialData,
+  totalCount: initialTotal,
 }: LeaderboardTableProps) {
   const [entries, setEntries] = useState<LeaderboardEntry[]>(initialData);
+  const [total, setTotal] = useState(initialTotal);
+  const [loading, setLoading] = useState(false);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  const hasMore = entries.length < total;
+
+  // Load next page
+  const loadMore = useCallback(async () => {
+    if (loading || !hasMore) return;
+    setLoading(true);
+    const { entries: newEntries, total: newTotal } = await fetchLeaderboardPage(
+      entries.length,
+      PAGE_SIZE
+    );
+    if (newEntries.length > 0) {
+      setEntries((prev) => [...prev, ...newEntries]);
+    }
+    if (newTotal > 0) {
+      setTotal(newTotal);
+    }
+    setLoading(false);
+  }, [entries.length, loading, hasMore]);
+
+  // IntersectionObserver for infinite scroll
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (observerEntries) => {
+        if (observerEntries[0].isIntersecting) {
+          loadMore();
+        }
+      },
+      { rootMargin: "200px" }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [loadMore]);
+
+  // Realtime: refresh currently loaded entries when bracket data changes
   useEffect(() => {
     const supabase = createClient();
 
@@ -51,9 +102,13 @@ export default function LeaderboardTable({
         "postgres_changes",
         { event: "*", schema: "public", table: "brackets" },
         () => {
-          fetchLeaderboard().then((data) => {
-            if (data.length > 0) setEntries(data);
-          });
+          // Re-fetch all currently loaded entries to keep rankings accurate
+          fetchLeaderboardPage(0, entries.length).then(
+            ({ entries: refreshed, total: newTotal }) => {
+              if (refreshed.length > 0) setEntries(refreshed);
+              if (newTotal > 0) setTotal(newTotal);
+            }
+          );
         }
       )
       .subscribe();
@@ -61,7 +116,7 @@ export default function LeaderboardTable({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [entries.length]);
 
   return (
     <div className="overflow-hidden rounded-2xl border border-white/5 bg-bg-card/40">
@@ -124,9 +179,7 @@ export default function LeaderboardTable({
                   <td className="px-4 py-3.5 sm:px-5">
                     <Link
                       href={`/brackets/${entry.id}`}
-                      className={`group inline-flex items-center gap-1.5 text-sm font-semibold transition-colors hover:text-court-orange ${
-                        isTopThree ? "text-text-primary" : "text-text-primary"
-                      }`}
+                      className="group inline-flex items-center gap-1.5 text-sm font-semibold text-text-primary transition-colors hover:text-court-orange"
                     >
                       <span className="truncate max-w-[180px] sm:max-w-none">
                         {entry.name}
@@ -184,7 +237,9 @@ export default function LeaderboardTable({
                         </span>
                       </div>
                     ) : (
-                      <span className="text-sm text-text-secondary/40">--</span>
+                      <span className="text-sm text-text-secondary/40">
+                        --
+                      </span>
                     )}
                   </td>
 
@@ -224,10 +279,45 @@ export default function LeaderboardTable({
         </table>
       </div>
 
-      {/* Entry count footer */}
+      {/* Infinite scroll sentinel + loading indicator */}
+      {hasMore && (
+        <div ref={sentinelRef} className="flex items-center justify-center py-6">
+          {loading ? (
+            <div className="flex items-center gap-2 text-text-secondary/60">
+              <svg
+                className="h-4 w-4 animate-spin"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                />
+              </svg>
+              <span className="text-xs">Loading more...</span>
+            </div>
+          ) : (
+            <span className="text-xs text-text-secondary/40">
+              Scroll for more
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* Footer */}
       <div className="border-t border-white/5 px-5 py-3">
         <p className="text-xs text-text-secondary/60">
-          {entries.length} bracket{entries.length !== 1 ? "s" : ""} submitted
+          Showing {entries.length} of {total} bracket
+          {total !== 1 ? "s" : ""}
         </p>
       </div>
     </div>
