@@ -314,7 +314,6 @@ export default function BasketballScene() {
     let time = 0;
     let shooting = false;
     let guidedShot = false;
-    let guidedTargetX = 0;
     let prevBallY = ball.position.y;
     let scoreCooldown = 0; // prevent double-counting
 
@@ -341,31 +340,36 @@ export default function BasketballScene() {
 
       if (intersects.length > 0) {
         // Clicked the ball — shoot toward a hoop
-        guidedTargetX =
+        const targetX =
           ball.position.x < 0 ? rimPositions.left : rimPositions.right;
-        const dx = guidedTargetX - ball.position.x;
+        const dx = targetX - ball.position.x;
         const dz = 0 - ball.position.z;
         const dist = Math.sqrt(dx * dx + dz * dz);
 
         // 95% of shots are guided to go in, 5% are wild
         guidedShot = Math.random() < 0.95;
 
-        // Compute arc trajectory: horizontal speed and vertical launch
-        const flightTime = dist / 0.18;
+        // Compute flight time using discrete physics so ball arrives at
+        // (targetX, rimY, 0) while clearly falling.
+        // After T frames: y = startY + velY*T + gravity*T*(T+1)/2
+        // velY(T) = velY_init + T*gravity must be < 0 (falling)
+        // Minimum T for falling: 0.003*T*(T-1) > rimY - startY
+        const minTForFalling = Math.ceil(
+          (1 + Math.sqrt(1 + 4 * (rimY - ball.position.y) / 0.003)) / 2
+        );
+        const T = Math.max(dist / 0.18, minTForFalling + 10);
         const neededVelY =
-          (rimY + 0.5 - ball.position.y + 0.5 * 0.006 * flightTime * flightTime) /
-          flightTime;
+          (rimY - ball.position.y - gravity * T * (T + 1) / 2) / T;
 
         if (guidedShot) {
-          // Perfect aim, no noise
-          velX = dx / flightTime;
-          velZ = dz / flightTime;
+          velX = dx / T;
+          velZ = dz / T;
+          velY = neededVelY;
         } else {
-          // Wild shot with big noise
-          velX = dx / flightTime + (Math.random() - 0.5) * 0.03;
-          velZ = dz / flightTime + (Math.random() - 0.5) * 0.03;
+          velX = dx / T + (Math.random() - 0.5) * 0.03;
+          velZ = dz / T + (Math.random() - 0.5) * 0.03;
+          velY = Math.max(neededVelY, 0.12);
         }
-        velY = Math.max(neededVelY, 0.12);
         shooting = true;
       } else {
         // Clicked elsewhere — small bounce
@@ -430,41 +434,31 @@ export default function BasketballScene() {
 
       // Ball physics
       velY += gravity;
-
-      // Guided shot: gently steer ball toward rim center while in the air
-      if (shooting && guidedShot && ball.position.y > 1.0) {
-        const errX = guidedTargetX - ball.position.x;
-        const errZ = 0 - ball.position.z;
-        // Nudge velocity toward the target — stronger as ball nears rim height
-        const corrStrength = ball.position.y > rimY - 0.5 ? 0.02 : 0.008;
-        velX += errX * corrStrength;
-        velZ += errZ * corrStrength;
-      }
-
       ball.position.y += velY;
       ball.position.x += velX;
       ball.position.z += velZ;
 
-      // Floor bounce
-      if (ball.position.y < 0.38) {
-        ball.position.y = 0.38;
-        velY = Math.abs(velY) * bounceFactor;
-        if (velY < 0.008) velY = 0.03;
-        if (shooting) shooting = false;
-      }
-
-      // Wall bounces (tighter on mobile to keep ball visible)
-      if (Math.abs(ball.position.x) > wallX) {
-        velX = -velX;
-        ball.position.x = Math.sign(ball.position.x) * wallX;
-      }
-      if (Math.abs(ball.position.z) > wallZ) {
-        velZ = -velZ;
-        ball.position.z = Math.sign(ball.position.z) * wallZ;
-      }
-
-      // Backboard collision (skip for guided shots so they swish cleanly)
+      // Skip all collisions during guided shots — let the ball fly its clean arc
       if (!(shooting && guidedShot)) {
+        // Floor bounce
+        if (ball.position.y < 0.38) {
+          ball.position.y = 0.38;
+          velY = Math.abs(velY) * bounceFactor;
+          if (velY < 0.008) velY = 0.03;
+          if (shooting) shooting = false;
+        }
+
+        // Wall bounces (tighter on mobile to keep ball visible)
+        if (Math.abs(ball.position.x) > wallX) {
+          velX = -velX;
+          ball.position.x = Math.sign(ball.position.x) * wallX;
+        }
+        if (Math.abs(ball.position.z) > wallZ) {
+          velZ = -velZ;
+          ball.position.z = Math.sign(ball.position.z) * wallZ;
+        }
+
+        // Backboard collision
         for (const side of [-1, 1]) {
           const bbX = side * 9.8;
           if (
