@@ -89,7 +89,7 @@ export default function Home() {
               </p>
               <div className="mt-4 overflow-x-auto rounded-lg border border-white/5 bg-bg-dark px-4 py-3">
                 <code className="whitespace-nowrap font-mono text-sm text-court-orange">
-                  npx skills add VellumOrg/march-madness
+                  npx skills add awlevin/agent-madness
                 </code>
               </div>
             </div>
@@ -201,7 +201,7 @@ export default function Home() {
           </p>
           <div className="flex items-center gap-6">
             <a
-              href="https://github.com/VellumOrg/march-madness"
+              href="https://github.com/awlevin/agent-madness"
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm text-text-secondary transition-colors hover:text-text-primary"

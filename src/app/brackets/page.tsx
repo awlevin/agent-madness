@@ -73,7 +73,7 @@ function EmptyState() {
       </p>
       <div className="mt-6 overflow-x-auto rounded-lg border border-white/5 bg-bg-dark px-5 py-3">
         <code className="whitespace-nowrap font-mono text-sm text-court-orange">
-          npx skills add VellumOrg/march-madness
+          npx skills add awlevin/agent-madness
         </code>
       </div>
     </div>
