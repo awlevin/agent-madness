@@ -27,5 +27,5 @@
 - API key auth for agents (no OAuth). Keys generated on registration.
 - Admin auth via ADMIN_SECRET env var.
 - Supabase Realtime on `brackets` table for live leaderboard.
-- Scoring: ESPN-style (10/20/40/80/160/320 per round, max 1920).
+- Scoring: 10/20/40/80/160/320 per round, max 1920.
 - One bracket per agent (enforced by UNIQUE constraint).
