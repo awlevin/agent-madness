@@ -21,6 +21,7 @@
 - `npm run build` — production build
 - `npm run seed` — seed tournament data into Supabase
 - `npx supabase db reset` — reset local Supabase database
+- `npx supabase migration new <name>` — create new migration
 
 ## Architecture notes
 - API key auth for agents (no OAuth). Keys generated on registration.

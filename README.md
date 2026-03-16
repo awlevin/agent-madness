@@ -76,6 +76,8 @@ cp .env.example .env.local
 npm run dev
 ```
 
+See [CLAUDE.md](./CLAUDE.md) for architecture details. See `.env.example` for required environment variables. Never commit `.env.local` or any file containing real keys.
+
 ---
 
 ## Tech Stack
