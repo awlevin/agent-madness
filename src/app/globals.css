@@ -4,10 +4,14 @@
   --color-court-green: #1a472a;
   --color-court-orange: #ff6b35;
   --color-court-wood: #c4a76c;
-  --color-bg-dark: #0a0a0f;
-  --color-bg-card: #141420;
-  --color-text-primary: #f0f0f5;
-  --color-text-secondary: #9090a0;
+  --color-bg-dark: #0a0a14;
+  --color-bg-card: #12122a;
+  --color-text-primary: #f0e8d0;
+  --color-text-secondary: #8888aa;
+  --color-arcade-yellow: #f0e68c;
+  --color-arcade-green: #00ff41;
+  --color-arcade-pink: #ff1493;
+  --color-arcade-blue: #4488ff;
 }
 
 body {
@@ -15,40 +19,106 @@ body {
   color: var(--color-text-primary);
 }
 
-/* ── Animations ── */
+/* ── CRT Scanline overlay ── */
+.scanlines::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.06) 2px,
+    rgba(0, 0, 0, 0.06) 4px
+  );
+}
 
+/* ── Pixel text glows ── */
+.pixel-glow-orange {
+  text-shadow:
+    0 0 10px rgba(255, 107, 53, 0.7),
+    0 0 20px rgba(255, 107, 53, 0.4),
+    0 0 40px rgba(255, 107, 53, 0.2);
+}
+.pixel-glow-green {
+  text-shadow:
+    0 0 10px rgba(0, 255, 65, 0.7),
+    0 0 20px rgba(0, 255, 65, 0.4);
+}
+.pixel-glow-yellow {
+  text-shadow:
+    0 0 10px rgba(240, 230, 140, 0.7),
+    0 0 20px rgba(240, 230, 140, 0.4);
+}
+
+/* ── Pixelated rendering ── */
+.pixel-render {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* ── Marquee animations ── */
+@keyframes marquee-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes marquee-right {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+.animate-marquee-left {
+  animation: marquee-left 80s linear infinite;
+}
+.animate-marquee-right {
+  animation: marquee-right 80s linear infinite;
+}
+
+/* Pause on hover */
+.group:hover .animate-marquee-left,
+.group:hover .animate-marquee-right {
+  animation-play-state: paused;
+}
+
+/* ── Blink (INSERT COIN style) ── */
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+.animate-blink {
+  animation: blink 1.2s step-start infinite;
+}
+
+/* ── Float animation for scattered elements ── */
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  33% { transform: translateY(-6px) rotate(2deg); }
+  66% { transform: translateY(2px) rotate(-1deg); }
+}
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* ── Shared animations ── */
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes scoreFlash {
-  0% {
-    background-color: transparent;
-  }
-  30% {
-    background-color: rgba(34, 197, 94, 0.2);
-  }
-  100% {
-    background-color: transparent;
-  }
+  0% { background-color: transparent; }
+  30% { background-color: rgba(34, 197, 94, 0.2); }
+  100% { background-color: transparent; }
 }
-
 .animate-fade-in-up {
   animation: fadeInUp 0.4s ease-out both;
 }
-
 .animate-score-flash {
   animation: scoreFlash 0.8s ease-out;
 }
-
-/* staggered children helper: set --i via style prop */
 .animate-stagger {
   animation: fadeInUp 0.4s ease-out both;
   animation-delay: calc(var(--i, 0) * 0.06s);

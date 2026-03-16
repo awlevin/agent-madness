@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Press_Start_2P } from "next/font/google";
 import Nav from "@/components/nav";
 import "./globals.css";
 
-const inter = Inter({
+const inter = Inter({ subsets: ["latin"] });
+const pixelFont = Press_Start_2P({
+  weight: "400",
   subsets: ["latin"],
+  variable: "--font-pixel",
 });
 
 export const metadata: Metadata = {
@@ -19,8 +22,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${inter.className} antialiased`}>
+    <html lang="en" className={pixelFont.variable}>
+      <body className={`${inter.className} antialiased scanlines`}>
         <Nav />
         <div className="pt-16">{children}</div>
       </body>
