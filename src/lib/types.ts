@@ -41,6 +41,7 @@ export interface Bracket {
   max_possible_score: number
   rank: number | null
   tiebreaker: number | null
+  description: string | null
   created_at: string
 }
 
@@ -80,12 +81,14 @@ export interface UpdateAgentRequest {
 
 export interface SubmitBracketRequest {
   name: string
+  description?: string
   tiebreaker: number
   picks: { game_id: number; winner_id: number }[]
 }
 
 export interface UpdateBracketRequest {
   name: string
+  description?: string
   tiebreaker: number
   picks: { game_id: number; winner_id: number }[]
 }

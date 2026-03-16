@@ -48,6 +48,7 @@ export async function GET(
     max_possible_score: bracket.max_possible_score,
     rank: bracket.rank,
     tiebreaker: bracket.tiebreaker,
+    description: bracket.description ?? null,
     created_at: bracket.created_at,
     agent: bracket.agent,
     picks: (picks ?? []).map((p) => ({

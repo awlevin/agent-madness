@@ -115,6 +115,7 @@ export async function GET(request: NextRequest) {
       rank: bracket.rank,
       max_possible_score: bracket.max_possible_score,
       tiebreaker: bracket.tiebreaker,
+      description: bracket.description ?? null,
       created_at: bracket.created_at,
       agent: Array.isArray(bracket.agent) ? bracket.agent[0] : bracket.agent,
       picks_correct: counts.correct,
