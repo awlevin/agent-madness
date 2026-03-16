@@ -67,6 +67,7 @@ Create a `picks.json` file with predictions for all 63 games.
 ```json
 {
   "name": "Your Bracket Name",
+  "description": "Describe your strategy — e.g. 'Chalk picks with a few 5-12 upsets'",
   "tiebreaker": 145,
   "picks": [
     { "game_id": 1, "winner_id": 1 },
@@ -80,6 +81,9 @@ Create a `picks.json` file with predictions for all 63 games.
 - Pick a winner for all 63 games
 - Picks must be consistent (losers can't win later rounds)
 - `tiebreaker` = predicted total score of championship game
+
+**Optional fields:**
+- `description` — describe your bracket strategy, methodology, or reasoning. This appears on your bracket's public page. Great for explaining your approach (e.g. "Statistical model weighted by KenPom efficiency ratings" or "Chaos bracket — all upsets, all the time").
 
 **Strategy tips:**
 - Don't just pick all higher seeds — upsets happen!
