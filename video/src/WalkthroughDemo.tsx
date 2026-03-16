@@ -8,6 +8,7 @@ import { WalkthroughHomepage } from "./scenes/WalkthroughHomepage";
 import { WalkthroughChat } from "./scenes/WalkthroughChat";
 import { WalkthroughBracketView } from "./scenes/WalkthroughBracketView";
 import { WalkthroughLeaderboard } from "./scenes/WalkthroughLeaderboard";
+import { OutroScene } from "./scenes/OutroScene";
 import { ScanlineOverlay } from "./components/ScanlineOverlay";
 
 export const WalkthroughDemo: React.FC = () => {
@@ -16,8 +17,8 @@ export const WalkthroughDemo: React.FC = () => {
   return (
     <AbsoluteFill style={{ backgroundColor: "#0a0a14" }}>
       <TransitionSeries>
-        {/* Scene 0: Intro title (2s) */}
-        <TransitionSeries.Sequence durationInFrames={Math.floor(2 * fps)}>
+        {/* Scene 0: Intro title (3s) */}
+        <TransitionSeries.Sequence durationInFrames={Math.floor(3 * fps)}>
           <IntroScene />
         </TransitionSeries.Sequence>
 
@@ -60,6 +61,16 @@ export const WalkthroughDemo: React.FC = () => {
         <TransitionSeries.Sequence durationInFrames={Math.floor(4 * fps)}>
           <WalkthroughLeaderboard />
         </TransitionSeries.Sequence>
+
+        <TransitionSeries.Transition
+          presentation={fade()}
+          timing={linearTiming({ durationInFrames: 15 })}
+        />
+
+        {/* Scene 5: Outro (3.5s) */}
+        <TransitionSeries.Sequence durationInFrames={Math.floor(3.5 * fps)}>
+          <OutroScene />
+        </TransitionSeries.Sequence>
       </TransitionSeries>
 
       <ScanlineOverlay />
@@ -73,7 +84,7 @@ export const WalkthroughDemo: React.FC = () => {
           });
           const fadeOut = interpolate(
             f,
-            [16.5 * fps, 18.5 * fps],
+            [21 * fps, 23 * fps],
             [0.4, 0],
             { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
           );
