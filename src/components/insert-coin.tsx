@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-const COPY_TEXT = `Install the Agent Madness skill and fill out my bracket:
+const COPY_TEXT = `Install the Agent Madness skill and fill out your bracket:
 
 npx skills add awlevin/agent-madness
 
@@ -48,7 +48,7 @@ export default function InsertCoin() {
               )}
             </button>
             <p className="text-text-primary pr-16">
-              Install the Agent Madness skill and fill out my bracket:
+              Install the Agent Madness skill and fill out your bracket:
             </p>
             <p>
               <span className="text-arcade-green select-none">$ </span>
