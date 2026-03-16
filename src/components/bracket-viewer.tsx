@@ -119,7 +119,13 @@ function usePredictedBracket(games: GameWithTeams[], picks?: BracketPick[]) {
   }, [games, picks]);
 }
 
-/* ─── Region bracket (4 rounds) ─── */
+/* ─── Region bracket (4 rounds) with absolute positioning + SVG connectors ─── */
+
+const GAME_H = 42; // approximate rendered height of a game card
+const GAME_W = 115; // matches w-[115px] in BracketGame
+const COL_GAP = 20; // horizontal gap between round columns (connector space)
+const R1_GAP = 4; // vertical gap between R1 games
+const NUM_ROUNDS = 4;
 
 interface RegionBracketProps {
   region: Region;
@@ -128,8 +134,6 @@ interface RegionBracketProps {
   predictedMatchups: Map<number, { team1: Team | null; team2: Team | null }>;
   eliminatedTeamIds: Set<number>;
   showResults: boolean;
-  /** If true, columns go R1 left -> R4 right (left half).
-   *  If false, columns go R4 left -> R1 right (right half). */
   leftToRight: boolean;
 }
 
@@ -142,61 +146,106 @@ function RegionBracket({
   showResults,
   leftToRight,
 }: RegionBracketProps) {
-  const roundOrder: RoundNumber[] = leftToRight
-    ? [1, 2, 3, 4]
-    : [4, 3, 2, 1];
+  const r1Count = rounds[1]?.length ?? 8;
+
+  // Compute vertical positions: R1 evenly spaced, R2+ centered on feeder pairs
+  const positions = useMemo(() => {
+    const pos: Record<number, number[]> = {};
+    pos[1] = Array.from({ length: r1Count }, (_, i) => i * (GAME_H + R1_GAP));
+    for (let r = 2; r <= NUM_ROUNDS; r++) {
+      const prev = pos[r - 1];
+      pos[r] = [];
+      for (let j = 0; j < Math.floor(prev.length / 2); j++) {
+        const topCenter = prev[2 * j] + GAME_H / 2;
+        const botCenter = prev[2 * j + 1] + GAME_H / 2;
+        pos[r].push((topCenter + botCenter) / 2 - GAME_H / 2);
+      }
+    }
+    return pos;
+  }, [r1Count]);
+
+  const totalHeight = r1Count * GAME_H + Math.max(0, r1Count - 1) * R1_GAP;
+  const totalWidth = NUM_ROUNDS * GAME_W + (NUM_ROUNDS - 1) * COL_GAP;
+
+  const colX = (round: number) => {
+    const col = leftToRight ? round - 1 : NUM_ROUNDS - round;
+    return col * (GAME_W + COL_GAP);
+  };
+
+  // Build SVG connector lines between rounds
+  const connectorLines = useMemo(() => {
+    const lines: { x1: number; y1: number; x2: number; y2: number }[] = [];
+    for (let r = 1; r < NUM_ROUNDS; r++) {
+      const curr = positions[r] ?? [];
+      const next = positions[r + 1] ?? [];
+
+      const fromX = leftToRight ? colX(r) + GAME_W : colX(r);
+      const toX = leftToRight ? colX(r + 1) : colX(r + 1) + GAME_W;
+      const midX = (fromX + toX) / 2;
+
+      for (let j = 0; j < next.length; j++) {
+        if (2 * j + 1 >= curr.length) break;
+        const topY = curr[2 * j] + GAME_H / 2;
+        const botY = curr[2 * j + 1] + GAME_H / 2;
+        const nextY = next[j] + GAME_H / 2;
+
+        // Horizontal from each feeder game to the midpoint
+        lines.push({ x1: fromX, y1: topY, x2: midX, y2: topY });
+        lines.push({ x1: fromX, y1: botY, x2: midX, y2: botY });
+        // Vertical connecting the pair
+        lines.push({ x1: midX, y1: topY, x2: midX, y2: botY });
+        // Horizontal from midpoint to the next round game
+        lines.push({ x1: midX, y1: nextY, x2: toX, y2: nextY });
+      }
+    }
+    return lines;
+  }, [positions, leftToRight]);
 
   return (
     <div className="flex flex-col">
       <h3 className="mb-2 text-center text-sm font-semibold uppercase tracking-wider text-court-orange">
         {REGION_NAMES[region]}
       </h3>
-      <div className="flex items-center gap-1">
-        {roundOrder.map((round) => {
-          const gamesInRound = rounds[round] ?? [];
-          // Vertical spacing increases each round so games align with feeders
-          const gapClass = round === 1
-            ? "gap-1"
-            : round === 2
-              ? "gap-[42px]"
-              : round === 3
-                ? "gap-[126px]"
-                : "gap-0";
+      <div className="relative" style={{ width: totalWidth, height: totalHeight }}>
+        {/* SVG connector lines */}
+        <svg
+          className="pointer-events-none absolute inset-0"
+          width={totalWidth}
+          height={totalHeight}
+        >
+          {connectorLines.map((line, i) => (
+            <line
+              key={i}
+              x1={line.x1}
+              y1={line.y1}
+              x2={line.x2}
+              y2={line.y2}
+              stroke="rgba(255,255,255,0.15)"
+              strokeWidth={1}
+            />
+          ))}
+        </svg>
 
-          return (
-            <div key={round} className="flex flex-col items-center">
-              <div className={`flex flex-col justify-center ${gapClass}`}>
-                {gamesInRound.map((game) => (
-                  <div key={game.id} className="relative flex items-center">
-                    {/* Connector line coming in from the previous round */}
-                    {round > 1 && (
-                      <div
-                        className={`absolute top-1/2 h-px w-2 bg-white/20 ${
-                          leftToRight ? "-left-2" : "-right-2"
-                        }`}
-                      />
-                    )}
-                    {/* Connector line going out to the next round */}
-                    {round < 4 && (
-                      <div
-                        className={`absolute top-1/2 h-px w-2 bg-white/20 ${
-                          leftToRight ? "-right-2" : "-left-2"
-                        }`}
-                      />
-                    )}
-                    <BracketGame
-                      game={game}
-                      pick={pickForGame(picks, game.id)}
-                      predictedTeam1={predictedMatchups.get(game.id)?.team1}
-                      predictedTeam2={predictedMatchups.get(game.id)?.team2}
-                      eliminatedTeamIds={eliminatedTeamIds}
-                      showResult={showResults}
-                    />
-                  </div>
-                ))}
-              </div>
+        {/* Game cards positioned absolutely */}
+        {([1, 2, 3, 4] as RoundNumber[]).map((round) => {
+          const gamesInRound = rounds[round] ?? [];
+          const tops = positions[round] ?? [];
+          return gamesInRound.map((game, i) => (
+            <div
+              key={game.id}
+              className="absolute"
+              style={{ left: colX(round), top: tops[i] }}
+            >
+              <BracketGame
+                game={game}
+                pick={pickForGame(picks, game.id)}
+                predictedTeam1={predictedMatchups.get(game.id)?.team1}
+                predictedTeam2={predictedMatchups.get(game.id)?.team2}
+                eliminatedTeamIds={eliminatedTeamIds}
+                showResult={showResults}
+              />
             </div>
-          );
+          ));
         })}
       </div>
     </div>

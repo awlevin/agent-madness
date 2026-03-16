@@ -35,15 +35,15 @@ function TeamRow({
 }) {
   if (!team) {
     return (
-      <div className="flex h-5 items-center gap-1 px-1.5 text-[11px] text-text-secondary">
-        <span className="w-4 text-center text-[9px] opacity-50">--</span>
+      <div className="flex h-5 items-center gap-1 px-1.5 text-xs text-text-secondary">
+        <span className="w-4 text-center text-[10px] opacity-50">--</span>
         <span className="truncate italic">TBD</span>
       </div>
     );
   }
 
   const rowClasses = [
-    "flex h-5 items-center gap-1 px-1.5 text-[11px] transition-colors",
+    "flex h-5 items-center gap-1 px-1.5 text-xs",
     isPicked ? "border-l-2 border-court-orange" : "border-l-2 border-transparent",
     isCorrect ? "bg-green-900/30" : "",
     isIncorrect ? "bg-red-900/30" : "",
@@ -53,7 +53,7 @@ function TeamRow({
 
   return (
     <div className={rowClasses}>
-      <span className="w-4 shrink-0 text-center text-[9px] font-semibold text-text-secondary">
+      <span className="w-4 shrink-0 text-center text-[10px] font-semibold text-text-secondary">
         {team.seed}
       </span>
       <Image
@@ -119,7 +119,7 @@ export default function BracketGame({
   const team2IsEliminated = !!(displayTeam2 && !game.team2 && eliminatedTeamIds?.has(displayTeam2.id));
 
   return (
-    <div className="w-[144px] shrink-0 overflow-hidden rounded-md border border-white/10 bg-bg-card">
+    <div className="w-[115px] shrink-0 overflow-hidden rounded-md border border-white/10 bg-bg-card transition-all duration-200 hover:border-white/25 hover:shadow-md hover:shadow-court-orange/10">
       <TeamRow
         team={displayTeam1}
         isPicked={team1IsPicked}
