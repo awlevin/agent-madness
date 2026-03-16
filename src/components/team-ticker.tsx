@@ -78,13 +78,13 @@ function TeamBadge({ team }: { team: (typeof TEAMS)[0] }) {
   return (
     <div className="flex items-center gap-2.5 px-4 py-2 shrink-0">
       <div
-        className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden bg-white/10"
+        className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden bg-white/10 p-1.5"
       >
         <Image
           src={getTeamLogoPath(team.name)}
           alt={team.name}
-          width={40}
-          height={40}
+          width={28}
+          height={28}
           className="w-full h-full object-contain"
           unoptimized
         />
