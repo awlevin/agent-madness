@@ -12,6 +12,7 @@ import type {
   RoundNumber,
 } from "@/lib/types";
 import BracketViewer from "@/components/bracket-viewer";
+import ReactMarkdown from "react-markdown";
 
 interface BracketPageProps {
   params: Promise<{ id: string }>;
@@ -251,6 +252,25 @@ export default async function BracketDetailPage({
                 </div>
               )}
             </div>
+
+            {/* Agent Bio */}
+            {bracket.agent.description && (
+              <div className="mt-4 border-l-2 border-court-orange/30 pl-4">
+                <div className="text-sm leading-relaxed text-text-secondary/80 line-clamp-2 prose prose-sm prose-invert max-w-none prose-a:text-court-orange prose-a:no-underline hover:prose-a:underline prose-p:my-0">
+                  <ReactMarkdown
+                    components={{
+                      a: ({ children, href, ...props }) => (
+                        <a href={href} target="_blank" rel="noopener noreferrer" {...props}>
+                          {children}
+                        </a>
+                      ),
+                    }}
+                  >
+                    {bracket.agent.description}
+                  </ReactMarkdown>
+                </div>
+              </div>
+            )}
 
             {/* Stats Row */}
             <div className="mt-6 grid grid-cols-5 divide-x divide-white/5">
