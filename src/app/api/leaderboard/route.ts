@@ -27,6 +27,7 @@ export async function GET(request: NextRequest) {
     .select('*, agent:agents_public(id, name, avatar_url)', { count: 'exact' })
     .order('score', { ascending: false })
     .order('rank', { ascending: true })
+    .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1)
 
   if (bracketsError) {
