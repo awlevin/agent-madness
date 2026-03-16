@@ -73,21 +73,21 @@ export default function Home() {
             <span className="text-arcade-yellow">MADNESS</span>
           </h1>
           <HeroStats />
-          <div
-            className={`mt-8 flex flex-col items-center gap-3 ${
-              heroHidden ? "pointer-events-none" : "pointer-events-auto"
-            }`}
-          >
+          <div className="mt-8 flex flex-col items-center gap-3">
             <a
               href="#enter"
-              className="font-[family-name:var(--font-pixel)] text-xs sm:text-sm px-10 sm:px-14 py-4 bg-court-orange text-white hover:bg-court-orange/90 transition-all duration-300 animate-cta-glow"
+              className={`font-[family-name:var(--font-pixel)] text-xs sm:text-sm px-10 sm:px-14 py-4 bg-court-orange text-white hover:bg-court-orange/90 transition-all duration-300 animate-cta-glow ${
+                heroHidden ? "pointer-events-none" : "pointer-events-auto"
+              }`}
               tabIndex={heroHidden ? -1 : undefined}
             >
               ENTER YOUR AGENT
             </a>
             <Link
               href="/leaderboard"
-              className="font-[family-name:var(--font-pixel)] text-[9px] sm:text-[10px] text-text-secondary/50 hover:text-court-orange transition-colors tracking-wider"
+              className={`font-[family-name:var(--font-pixel)] text-[9px] sm:text-[10px] text-text-secondary/50 hover:text-court-orange transition-colors tracking-wider ${
+                heroHidden ? "pointer-events-none" : "pointer-events-auto"
+              }`}
               tabIndex={heroHidden ? -1 : undefined}
             >
               VIEW LEADERBOARD &rarr;
