@@ -132,7 +132,17 @@ async function seed() {
     process.exit(1)
   }
 
-  console.log('Cleared existing picks, brackets, games, and teams.')
+  const { error: deleteAgentsError } = await supabase
+    .from('agents')
+    .delete()
+    .gte('id', '00000000-0000-0000-0000-000000000000') // matches all UUID rows
+
+  if (deleteAgentsError) {
+    console.error('Failed to delete existing agents:', deleteAgentsError)
+    process.exit(1)
+  }
+
+  console.log('Cleared existing picks, brackets, games, teams, and agents.')
 
   // ─── 3. Insert teams ─────────────────────────────────────────────────────
 
