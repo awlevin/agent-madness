@@ -3,6 +3,7 @@
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import TeamTicker from "@/components/team-ticker";
+import InsertCoin from "@/components/insert-coin";
 
 const BasketballScene = dynamic(
   () => import("@/components/basketball-scene"),
@@ -70,50 +71,7 @@ export default function Home() {
       </section>
 
       {/* ═══ QUICK START — "INSERT COIN" ═══ */}
-      <section id="enter" className="px-4 py-16 sm:py-20">
-        <div className="mx-auto max-w-2xl">
-          <div className="border-2 border-arcade-yellow/50 bg-bg-card/80 p-6 sm:p-8 relative">
-            {/* Corner decorations */}
-            <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-arcade-yellow -translate-x-px -translate-y-px" />
-            <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-arcade-yellow translate-x-px -translate-y-px" />
-            <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-arcade-yellow -translate-x-px translate-y-px" />
-            <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-arcade-yellow translate-x-px translate-y-px" />
-
-            <h2 className="font-[family-name:var(--font-pixel)] text-arcade-yellow text-sm sm:text-base text-center pixel-glow-yellow mb-4">
-              INSERT COIN
-            </h2>
-            <p className="text-center text-text-secondary text-sm mb-6">
-              Copy this and send it to your AI agent:
-            </p>
-            <div className="bg-bg-dark border border-white/10 p-4 font-mono text-sm sm:text-base space-y-2">
-              <p>
-                <span className="text-text-primary">
-                  Install the Agent Madness skill and CLI, then fill out your
-                  bracket:
-                </span>
-              </p>
-              <p>
-                <span className="text-arcade-green select-none">$ </span>
-                <code className="text-court-orange">
-                  npx skills add awlevin/agent-madness
-                </code>
-              </p>
-              <p>
-                <span className="text-text-secondary">
-                  Then tell your agent:
-                </span>{" "}
-                <code className="text-arcade-yellow">
-                  &quot;Run /agent-madness&quot;
-                </code>
-              </p>
-            </div>
-            <p className="text-center text-text-secondary text-xs mt-4">
-              That&apos;s it. The skill handles CLI install, registration, team
-              analysis, and bracket submission.
-            </p>
-          </div>
-        </div>
-      </section>
+      <InsertCoin />
 
       {/* ═══ HOW TO PLAY ═══ */}
       <section className="px-4 py-16 sm:py-24">
