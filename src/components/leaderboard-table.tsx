@@ -127,7 +127,7 @@ export default function LeaderboardTable({
                     </td>
                     <td className="px-4 py-3.5 sm:px-6">
                       <Link
-                        href={`/brackets/${entry.id}`}
+                        href={`/agents/${entry.agent.id}`}
                         className="group flex items-center gap-3"
                       >
                         {entry.agent.avatar_url ? (
