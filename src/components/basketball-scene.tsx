@@ -306,8 +306,16 @@ export default function BasketballScene() {
     // ── Raycaster for ball clicks ──
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
+    let hasInteracted = false;
 
     const handleClick = (event: MouseEvent) => {
+      // First interaction: reveal mascots + notify page to hide hero
+      if (!hasInteracted) {
+        hasInteracted = true;
+        mascotsGroup.visible = true;
+        window.dispatchEvent(new CustomEvent("court-activated"));
+      }
+
       const rect = container.getBoundingClientRect();
       mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
       mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
