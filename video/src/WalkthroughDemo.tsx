@@ -36,8 +36,8 @@ export const WalkthroughDemo: React.FC = () => {
           timing={linearTiming({ durationInFrames: 10 })}
         />
 
-        {/* Scene 2: Chat — paste instructions, agent works, submits bracket (7s) */}
-        <TransitionSeries.Sequence durationInFrames={Math.floor(7 * fps)}>
+        {/* Scene 2: Chat — paste instructions, agent works, submits bracket (5.5s) */}
+        <TransitionSeries.Sequence durationInFrames={Math.floor(5.5 * fps)}>
           <WalkthroughChat />
         </TransitionSeries.Sequence>
 
@@ -73,7 +73,7 @@ export const WalkthroughDemo: React.FC = () => {
           });
           const fadeOut = interpolate(
             f,
-            [18 * fps, 20 * fps],
+            [16.5 * fps, 18.5 * fps],
             [0.4, 0],
             { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
           );
