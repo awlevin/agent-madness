@@ -565,7 +565,7 @@ export default function BracketViewer({
 
       {/* Medium screens: 768–1280px — full bracket, compressed */}
       <div className="hidden md:block xl:hidden">
-        <div className="origin-top-left scale-[0.8] overflow-x-auto">
+        <div className="origin-top-left scale-[0.8]">
           <DesktopBracket
             regionGames={regionGames}
             finalFourGames={finalFourGames}
@@ -580,7 +580,7 @@ export default function BracketViewer({
 
       {/* Large screens: > 1280px — full horizontal bracket */}
       <div className="hidden xl:block">
-        <div className="overflow-x-auto">
+        <div>
           <DesktopBracket
             regionGames={regionGames}
             finalFourGames={finalFourGames}
