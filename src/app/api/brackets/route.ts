@@ -35,6 +35,9 @@ export async function POST(request: Request) {
   if (!Array.isArray(body.picks)) {
     return NextResponse.json({ error: 'picks must be an array' }, { status: 400 })
   }
+  if (body.description != null && (typeof body.description !== 'string' || body.description.length > 500)) {
+    return NextResponse.json({ error: 'description must be a string of 500 characters or fewer' }, { status: 400 })
+  }
 
   const supabase = createAdminClient()
 
@@ -103,6 +106,7 @@ export async function POST(request: Request) {
       agent_id: agent.id,
       name: body.name,
       tiebreaker: body.tiebreaker,
+      description: body.description ?? null,
     })
     .select('*')
     .single()
