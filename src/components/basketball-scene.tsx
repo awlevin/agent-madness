@@ -313,6 +313,8 @@ export default function BasketballScene() {
     const bounceFactor = 0.68;
     let time = 0;
     let shooting = false;
+    let guidedShot = false;
+    let guidedTargetX = 0;
     let prevBallY = ball.position.y;
     let scoreCooldown = 0; // prevent double-counting
 
@@ -339,11 +341,14 @@ export default function BasketballScene() {
 
       if (intersects.length > 0) {
         // Clicked the ball — shoot toward a hoop
-        const targetX =
+        guidedTargetX =
           ball.position.x < 0 ? rimPositions.left : rimPositions.right;
-        const dx = targetX - ball.position.x;
+        const dx = guidedTargetX - ball.position.x;
         const dz = 0 - ball.position.z;
         const dist = Math.sqrt(dx * dx + dz * dz);
+
+        // 95% of shots are guided to go in, 5% are wild
+        guidedShot = Math.random() < 0.95;
 
         // Compute arc trajectory: horizontal speed and vertical launch
         const flightTime = dist / 0.18;
@@ -351,8 +356,15 @@ export default function BasketballScene() {
           (rimY + 0.5 - ball.position.y + 0.5 * 0.006 * flightTime * flightTime) /
           flightTime;
 
-        velX = dx / flightTime + (Math.random() - 0.5) * 0.004;
-        velZ = dz / flightTime + (Math.random() - 0.5) * 0.004;
+        if (guidedShot) {
+          // Perfect aim, no noise
+          velX = dx / flightTime;
+          velZ = dz / flightTime;
+        } else {
+          // Wild shot with big noise
+          velX = dx / flightTime + (Math.random() - 0.5) * 0.03;
+          velZ = dz / flightTime + (Math.random() - 0.5) * 0.03;
+        }
         velY = Math.max(neededVelY, 0.12);
         shooting = true;
       } else {
@@ -418,6 +430,17 @@ export default function BasketballScene() {
 
       // Ball physics
       velY += gravity;
+
+      // Guided shot: gently steer ball toward rim center while in the air
+      if (shooting && guidedShot && ball.position.y > 1.0) {
+        const errX = guidedTargetX - ball.position.x;
+        const errZ = 0 - ball.position.z;
+        // Nudge velocity toward the target — stronger as ball nears rim height
+        const corrStrength = ball.position.y > rimY - 0.5 ? 0.02 : 0.008;
+        velX += errX * corrStrength;
+        velZ += errZ * corrStrength;
+      }
+
       ball.position.y += velY;
       ball.position.x += velX;
       ball.position.z += velZ;
@@ -440,17 +463,19 @@ export default function BasketballScene() {
         ball.position.z = Math.sign(ball.position.z) * wallZ;
       }
 
-      // Backboard collision (ball bouncing off backboard)
-      for (const side of [-1, 1]) {
-        const bbX = side * 9.8;
-        if (
-          Math.abs(ball.position.x - bbX) < 0.3 &&
-          ball.position.y > 2.9 &&
-          ball.position.y < 4.1 &&
-          Math.abs(ball.position.z) < 0.9
-        ) {
-          velX = -velX * 0.6;
-          ball.position.x = bbX - side * 0.3;
+      // Backboard collision (skip for guided shots so they swish cleanly)
+      if (!(shooting && guidedShot)) {
+        for (const side of [-1, 1]) {
+          const bbX = side * 9.8;
+          if (
+            Math.abs(ball.position.x - bbX) < 0.3 &&
+            ball.position.y > 2.9 &&
+            ball.position.y < 4.1 &&
+            Math.abs(ball.position.z) < 0.9
+          ) {
+            velX = -velX * 0.6;
+            ball.position.x = bbX - side * 0.3;
+          }
         }
       }
 
