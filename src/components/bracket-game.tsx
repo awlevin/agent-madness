@@ -7,6 +7,12 @@ import { getTeamLogoPath } from "@/lib/team-logos";
 interface BracketGameProps {
   game: GameWithTeams;
   pick: BracketPick | null;
+  /** Predicted team for slot 1 (from feeder game pick) */
+  predictedTeam1?: Team | null;
+  /** Predicted team for slot 2 (from feeder game pick) */
+  predictedTeam2?: Team | null;
+  /** Teams that have been eliminated from the tournament */
+  eliminatedTeamIds?: Set<number>;
   showResult: boolean;
 }
 
@@ -16,6 +22,7 @@ function TeamRow({
   isWinner,
   isCorrect,
   isIncorrect,
+  isEliminated,
   showResult,
 }: {
   team: Team | null;
@@ -23,19 +30,20 @@ function TeamRow({
   isWinner: boolean;
   isCorrect: boolean;
   isIncorrect: boolean;
+  isEliminated: boolean;
   showResult: boolean;
 }) {
   if (!team) {
     return (
-      <div className="flex h-6 items-center gap-1.5 px-2 text-xs text-text-secondary">
-        <span className="w-5 text-center text-[10px] opacity-50">--</span>
+      <div className="flex h-5 items-center gap-1 px-1.5 text-[11px] text-text-secondary">
+        <span className="w-4 text-center text-[9px] opacity-50">--</span>
         <span className="truncate italic">TBD</span>
       </div>
     );
   }
 
   const rowClasses = [
-    "flex h-6 items-center gap-1.5 px-2 text-xs transition-colors",
+    "flex h-5 items-center gap-1 px-1.5 text-[11px] transition-colors",
     isPicked ? "border-l-2 border-court-orange" : "border-l-2 border-transparent",
     isCorrect ? "bg-green-900/30" : "",
     isIncorrect ? "bg-red-900/30" : "",
@@ -45,21 +53,25 @@ function TeamRow({
 
   return (
     <div className={rowClasses}>
-      <span className="w-5 shrink-0 text-center text-[10px] font-semibold text-text-secondary">
+      <span className="w-4 shrink-0 text-center text-[9px] font-semibold text-text-secondary">
         {team.seed}
       </span>
       <Image
         src={getTeamLogoPath(team.short_name)}
         alt={team.short_name}
-        width={16}
-        height={16}
+        width={14}
+        height={14}
         className="shrink-0 [image-rendering:pixelated]"
         unoptimized
       />
       <span
         className={[
           "truncate font-medium",
-          isIncorrect ? "text-red-400 line-through" : "text-text-primary",
+          isIncorrect
+            ? "text-red-400 line-through"
+            : isEliminated
+              ? "text-red-400/60 line-through"
+              : "text-text-primary",
         ].join(" ")}
       >
         {team.short_name}
@@ -76,25 +88,17 @@ function TeamRow({
 export default function BracketGame({
   game,
   pick,
+  predictedTeam1,
+  predictedTeam2,
+  eliminatedTeamIds,
   showResult,
 }: BracketGameProps) {
   const winnerId = game.winner_id;
   const pickedWinnerId = pick?.predicted_winner_id ?? null;
-  const predictedWinner = pick?.predicted_winner ?? null;
 
-  // Fill in TBD slots with the predicted winner so picks are visible
-  // before matchups are determined
-  let displayTeam1 = game.team1;
-  let displayTeam2 = game.team2;
-  if (predictedWinner) {
-    if (!displayTeam1 && !displayTeam2) {
-      displayTeam1 = predictedWinner;
-    } else if (displayTeam1 && !displayTeam2 && pickedWinnerId !== displayTeam1.id) {
-      displayTeam2 = predictedWinner;
-    } else if (!displayTeam1 && displayTeam2 && pickedWinnerId !== displayTeam2.id) {
-      displayTeam1 = predictedWinner;
-    }
-  }
+  // Use predicted teams from feeder picks to fill TBD slots
+  const displayTeam1 = game.team1 ?? predictedTeam1 ?? null;
+  const displayTeam2 = game.team2 ?? predictedTeam2 ?? null;
 
   const team1IsPicked = pickedWinnerId !== null && pickedWinnerId === displayTeam1?.id;
   const team2IsPicked = pickedWinnerId !== null && pickedWinnerId === displayTeam2?.id;
@@ -110,14 +114,19 @@ export default function BracketGame({
   const team2IsIncorrect =
     showResult && team2IsPicked && winnerId !== null && !team2IsWinner;
 
+  // A predicted team is "eliminated" if they lost in a prior round
+  const team1IsEliminated = !!(displayTeam1 && !game.team1 && eliminatedTeamIds?.has(displayTeam1.id));
+  const team2IsEliminated = !!(displayTeam2 && !game.team2 && eliminatedTeamIds?.has(displayTeam2.id));
+
   return (
-    <div className="w-[180px] shrink-0 overflow-hidden rounded-md border border-white/10 bg-bg-card">
+    <div className="w-[144px] shrink-0 overflow-hidden rounded-md border border-white/10 bg-bg-card">
       <TeamRow
         team={displayTeam1}
         isPicked={team1IsPicked}
         isWinner={team1IsWinner}
         isCorrect={team1IsCorrect}
         isIncorrect={team1IsIncorrect}
+        isEliminated={team1IsEliminated}
         showResult={showResult}
       />
       <div className="border-t border-white/5" />
@@ -127,6 +136,7 @@ export default function BracketGame({
         isWinner={team2IsWinner}
         isCorrect={team2IsCorrect}
         isIncorrect={team2IsIncorrect}
+        isEliminated={team2IsEliminated}
         showResult={showResult}
       />
     </div>
