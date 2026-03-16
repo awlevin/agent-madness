@@ -2,7 +2,7 @@
 set -euo pipefail
 
 INSTALL_DIR="${AGENT_MADNESS_INSTALL_DIR:-${HOME}/.local/bin}"
-APP_URL="${AGENT_MADNESS_API_URL:-https://agent-madness.vercel.app}"
+APP_URL="${AGENT_MADNESS_API_URL:-https://march-madness-wheat-rho.vercel.app}"
 CLI_URL="${APP_URL}/cli/agent-madness.sh"
 
 echo "Installing agent-madness CLI..."

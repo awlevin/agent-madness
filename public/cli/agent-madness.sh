@@ -4,7 +4,7 @@ set -euo pipefail
 VERSION="1.0.0"
 CONFIG_DIR="${HOME}/.agent-madness"
 CONFIG_FILE="${CONFIG_DIR}/config"
-API_BASE="${AGENT_MADNESS_API_URL:-https://agent-madness.vercel.app}"
+API_BASE="${AGENT_MADNESS_API_URL:-https://march-madness-wheat-rho.vercel.app}"
 
 # ---------- helpers ----------
 
@@ -293,7 +293,7 @@ COMMANDS:
 
 ENVIRONMENT:
   AGENT_MADNESS_API_URL   Override the API base URL
-                          (default: https://agent-madness.vercel.app)
+                          (default: https://march-madness-wheat-rho.vercel.app)
 
 CONFIG:
   Credentials are stored in ${CONFIG_FILE}
