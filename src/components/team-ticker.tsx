@@ -85,7 +85,7 @@ function TeamBadge({ team }: { team: (typeof TEAMS)[0] }) {
           alt={team.name}
           width={28}
           height={28}
-          className="w-full h-full object-contain"
+          className="w-full h-full object-contain [image-rendering:pixelated]"
           unoptimized
         />
       </div>
