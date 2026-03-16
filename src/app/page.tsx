@@ -6,7 +6,6 @@ import dynamic from "next/dynamic";
 import TeamTicker from "@/components/team-ticker";
 import InsertCoin from "@/components/insert-coin";
 import HeroStats from "@/components/hero-stats";
-import RecentBrackets from "@/components/recent-brackets";
 
 const BasketballScene = dynamic(
   () => import("@/components/basketball-scene"),
@@ -170,83 +169,6 @@ export default function Home() {
               </p>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* ═══ SCORING TABLE ═══ */}
-      <section className="px-4 py-16 sm:py-24 bg-bg-card/40 border-y border-white/5">
-        <div className="mx-auto max-w-2xl">
-          <h2 className="font-[family-name:var(--font-pixel)] text-lg sm:text-xl md:text-2xl text-center text-court-orange pixel-glow-orange mb-2">
-            HIGH SCORES
-          </h2>
-          <p className="text-center text-text-secondary text-[10px] font-[family-name:var(--font-pixel)] mb-10 tracking-wider">
-            POINTS PER ROUND
-          </p>
-
-          <div className="border border-white/10 bg-bg-dark/80 overflow-hidden">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-white/10">
-                  <th className="px-4 py-3 text-left font-[family-name:var(--font-pixel)] text-[8px] sm:text-[10px] text-text-secondary">
-                    ROUND
-                  </th>
-                  <th className="px-4 py-3 text-right font-[family-name:var(--font-pixel)] text-[8px] sm:text-[10px] text-text-secondary">
-                    PTS
-                  </th>
-                  <th className="px-4 py-3 text-right font-[family-name:var(--font-pixel)] text-[8px] sm:text-[10px] text-text-secondary hidden sm:table-cell">
-                    GAMES
-                  </th>
-                  <th className="px-4 py-3 text-right font-[family-name:var(--font-pixel)] text-[8px] sm:text-[10px] text-text-secondary">
-                    MAX
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {[
-                  { round: "Round of 64", pts: 10, games: 32, max: 320 },
-                  { round: "Round of 32", pts: 20, games: 16, max: 320 },
-                  { round: "Sweet 16", pts: 40, games: 8, max: 320 },
-                  { round: "Elite 8", pts: 80, games: 4, max: 320 },
-                  { round: "Final Four", pts: 160, games: 2, max: 320 },
-                  { round: "Championship", pts: 320, games: 1, max: 320 },
-                ].map((row) => (
-                  <tr
-                    key={row.round}
-                    className="hover:bg-white/[0.02] transition-colors"
-                  >
-                    <td className="px-4 py-2.5 text-sm text-text-primary">
-                      {row.round}
-                    </td>
-                    <td className="px-4 py-2.5 text-right font-[family-name:var(--font-pixel)] text-[10px] sm:text-xs text-court-orange">
-                      {row.pts}
-                    </td>
-                    <td className="px-4 py-2.5 text-right text-sm text-text-secondary hidden sm:table-cell">
-                      {row.games}
-                    </td>
-                    <td className="px-4 py-2.5 text-right text-sm text-text-secondary">
-                      {row.max}
-                    </td>
-                  </tr>
-                ))}
-                <tr className="bg-arcade-green/5 border-t border-arcade-green/30">
-                  <td className="px-4 py-3 font-[family-name:var(--font-pixel)] text-[10px] sm:text-xs text-arcade-green">
-                    PERFECT
-                  </td>
-                  <td className="px-4 py-3 text-right font-[family-name:var(--font-pixel)] text-[10px] sm:text-xs text-arcade-green">
-                    &mdash;
-                  </td>
-                  <td className="px-4 py-3 text-right font-[family-name:var(--font-pixel)] text-[10px] sm:text-xs text-text-secondary hidden sm:table-cell">
-                    63
-                  </td>
-                  <td className="px-4 py-3 text-right font-[family-name:var(--font-pixel)] text-sm text-arcade-green pixel-glow-green">
-                    1,920
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <RecentBrackets />
         </div>
       </section>
 
