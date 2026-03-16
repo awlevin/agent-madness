@@ -68,12 +68,65 @@ function pickForGame(
   return picks.find((p) => p.game_id === gameId) ?? null;
 }
 
+/**
+ * Compute predicted matchups for every game by resolving feeder game picks,
+ * and determine which teams have been eliminated from the tournament.
+ */
+function usePredictedBracket(games: GameWithTeams[], picks?: BracketPick[]) {
+  return useMemo(() => {
+    const predictedMatchups = new Map<number, { team1: Team | null; team2: Team | null }>();
+    const eliminatedTeamIds = new Set<number>();
+
+    if (!picks || picks.length === 0) {
+      return { predictedMatchups, eliminatedTeamIds };
+    }
+
+    const picksByGameId = new Map<number, BracketPick>();
+    for (const pick of picks) {
+      picksByGameId.set(pick.game_id, pick);
+    }
+
+    // Eliminated = lost a completed game
+    for (const game of games) {
+      if (game.winner_id !== null) {
+        if (game.team1_id !== null && game.team1_id !== game.winner_id) {
+          eliminatedTeamIds.add(game.team1_id);
+        }
+        if (game.team2_id !== null && game.team2_id !== game.winner_id) {
+          eliminatedTeamIds.add(game.team2_id);
+        }
+      }
+    }
+
+    // Resolve predicted teams for each game from feeder game picks
+    for (const game of games) {
+      let predTeam1: Team | null = game.team1;
+      let predTeam2: Team | null = game.team2;
+
+      if (!predTeam1 && game.feed_game_1_id) {
+        const feederPick = picksByGameId.get(game.feed_game_1_id);
+        predTeam1 = feederPick?.predicted_winner ?? null;
+      }
+      if (!predTeam2 && game.feed_game_2_id) {
+        const feederPick = picksByGameId.get(game.feed_game_2_id);
+        predTeam2 = feederPick?.predicted_winner ?? null;
+      }
+
+      predictedMatchups.set(game.id, { team1: predTeam1, team2: predTeam2 });
+    }
+
+    return { predictedMatchups, eliminatedTeamIds };
+  }, [games, picks]);
+}
+
 /* ─── Region bracket (4 rounds) ─── */
 
 interface RegionBracketProps {
   region: Region;
   rounds: Record<number, GameWithTeams[]>;
   picks?: BracketPick[];
+  predictedMatchups: Map<number, { team1: Team | null; team2: Team | null }>;
+  eliminatedTeamIds: Set<number>;
   showResults: boolean;
   /** If true, columns go R1 left -> R4 right (left half).
    *  If false, columns go R4 left -> R1 right (right half). */
@@ -84,6 +137,8 @@ function RegionBracket({
   region,
   rounds,
   picks,
+  predictedMatchups,
+  eliminatedTeamIds,
   showResults,
   leftToRight,
 }: RegionBracketProps) {
@@ -103,9 +158,9 @@ function RegionBracket({
           const gapClass = round === 1
             ? "gap-1"
             : round === 2
-              ? "gap-[52px]"
+              ? "gap-[42px]"
               : round === 3
-                ? "gap-[156px]"
+                ? "gap-[126px]"
                 : "gap-0";
 
           return (
@@ -132,6 +187,9 @@ function RegionBracket({
                     <BracketGame
                       game={game}
                       pick={pickForGame(picks, game.id)}
+                      predictedTeam1={predictedMatchups.get(game.id)?.team1}
+                      predictedTeam2={predictedMatchups.get(game.id)?.team2}
+                      eliminatedTeamIds={eliminatedTeamIds}
                       showResult={showResults}
                     />
                   </div>
@@ -151,6 +209,8 @@ interface FinalFourProps {
   finalFourGames: GameWithTeams[];
   championshipGame: GameWithTeams[];
   picks?: BracketPick[];
+  predictedMatchups: Map<number, { team1: Team | null; team2: Team | null }>;
+  eliminatedTeamIds: Set<number>;
   showResults: boolean;
 }
 
@@ -158,6 +218,8 @@ function FinalFourColumn({
   finalFourGames,
   championshipGame,
   picks,
+  predictedMatchups,
+  eliminatedTeamIds,
   showResults,
 }: FinalFourProps) {
   return (
@@ -171,6 +233,9 @@ function FinalFourColumn({
             key={game.id}
             game={game}
             pick={pickForGame(picks, game.id)}
+            predictedTeam1={predictedMatchups.get(game.id)?.team1}
+            predictedTeam2={predictedMatchups.get(game.id)?.team2}
+            eliminatedTeamIds={eliminatedTeamIds}
             showResult={showResults}
           />
         ))}
@@ -185,6 +250,9 @@ function FinalFourColumn({
               key={game.id}
               game={game}
               pick={pickForGame(picks, game.id)}
+              predictedTeam1={predictedMatchups.get(game.id)?.team1}
+              predictedTeam2={predictedMatchups.get(game.id)?.team2}
+              eliminatedTeamIds={eliminatedTeamIds}
               showResult={showResults}
             />
           ))}
@@ -201,6 +269,8 @@ interface MobileBracketProps {
   finalFourGames: GameWithTeams[];
   championshipGame: GameWithTeams[];
   picks?: BracketPick[];
+  predictedMatchups: Map<number, { team1: Team | null; team2: Team | null }>;
+  eliminatedTeamIds: Set<number>;
   showResults: boolean;
 }
 
@@ -211,6 +281,8 @@ function MobileBracket({
   finalFourGames,
   championshipGame,
   picks,
+  predictedMatchups,
+  eliminatedTeamIds,
   showResults,
 }: MobileBracketProps) {
   const [activeTab, setActiveTab] = useState<MobileTab>("east");
@@ -248,6 +320,8 @@ function MobileBracket({
           finalFourGames={finalFourGames}
           championshipGame={championshipGame}
           picks={picks}
+          predictedMatchups={predictedMatchups}
+          eliminatedTeamIds={eliminatedTeamIds}
           showResults={showResults}
         />
       ) : (
@@ -255,6 +329,8 @@ function MobileBracket({
           region={activeTab}
           rounds={regionGames[activeTab]}
           picks={picks}
+          predictedMatchups={predictedMatchups}
+          eliminatedTeamIds={eliminatedTeamIds}
           showResults={showResults}
         />
       )}
@@ -266,11 +342,15 @@ function MobileRegion({
   region,
   rounds,
   picks,
+  predictedMatchups,
+  eliminatedTeamIds,
   showResults,
 }: {
   region: Region;
   rounds: Record<number, GameWithTeams[]>;
   picks?: BracketPick[];
+  predictedMatchups: Map<number, { team1: Team | null; team2: Team | null }>;
+  eliminatedTeamIds: Set<number>;
   showResults: boolean;
 }) {
   const roundNumbers: RoundNumber[] = [1, 2, 3, 4];
@@ -300,6 +380,9 @@ function MobileRegion({
                   key={game.id}
                   game={game}
                   pick={pickForGame(picks, game.id)}
+                  predictedTeam1={predictedMatchups.get(game.id)?.team1}
+                  predictedTeam2={predictedMatchups.get(game.id)?.team2}
+                  eliminatedTeamIds={eliminatedTeamIds}
                   showResult={showResults}
                 />
               ))}
@@ -318,6 +401,8 @@ interface DesktopBracketProps {
   finalFourGames: GameWithTeams[];
   championshipGame: GameWithTeams[];
   picks?: BracketPick[];
+  predictedMatchups: Map<number, { team1: Team | null; team2: Team | null }>;
+  eliminatedTeamIds: Set<number>;
   showResults: boolean;
 }
 
@@ -326,6 +411,8 @@ function DesktopBracket({
   finalFourGames,
   championshipGame,
   picks,
+  predictedMatchups,
+  eliminatedTeamIds,
   showResults,
 }: DesktopBracketProps) {
   // Left half: East (top) and Midwest (bottom) — R1 on far left
@@ -338,6 +425,8 @@ function DesktopBracket({
           region="east"
           rounds={regionGames.east}
           picks={picks}
+          predictedMatchups={predictedMatchups}
+          eliminatedTeamIds={eliminatedTeamIds}
           showResults={showResults}
           leftToRight={true}
         />
@@ -345,6 +434,8 @@ function DesktopBracket({
           region="midwest"
           rounds={regionGames.midwest}
           picks={picks}
+          predictedMatchups={predictedMatchups}
+          eliminatedTeamIds={eliminatedTeamIds}
           showResults={showResults}
           leftToRight={true}
         />
@@ -356,6 +447,8 @@ function DesktopBracket({
           finalFourGames={finalFourGames}
           championshipGame={championshipGame}
           picks={picks}
+          predictedMatchups={predictedMatchups}
+          eliminatedTeamIds={eliminatedTeamIds}
           showResults={showResults}
         />
       </div>
@@ -366,6 +459,8 @@ function DesktopBracket({
           region="west"
           rounds={regionGames.west}
           picks={picks}
+          predictedMatchups={predictedMatchups}
+          eliminatedTeamIds={eliminatedTeamIds}
           showResults={showResults}
           leftToRight={false}
         />
@@ -373,6 +468,8 @@ function DesktopBracket({
           region="south"
           rounds={regionGames.south}
           picks={picks}
+          predictedMatchups={predictedMatchups}
+          eliminatedTeamIds={eliminatedTeamIds}
           showResults={showResults}
           leftToRight={false}
         />
@@ -391,6 +488,8 @@ export default function BracketViewer({
 }: BracketViewerProps) {
   const { regionGames, finalFourGames, championshipGame } =
     useOrganizedGames(games);
+  const { predictedMatchups, eliminatedTeamIds } =
+    usePredictedBracket(games, picks);
 
   if (games.length === 0) {
     return (
@@ -409,6 +508,8 @@ export default function BracketViewer({
           finalFourGames={finalFourGames}
           championshipGame={championshipGame}
           picks={picks}
+          predictedMatchups={predictedMatchups}
+          eliminatedTeamIds={eliminatedTeamIds}
           showResults={showResults}
         />
       </div>
@@ -421,6 +522,8 @@ export default function BracketViewer({
             finalFourGames={finalFourGames}
             championshipGame={championshipGame}
             picks={picks}
+            predictedMatchups={predictedMatchups}
+            eliminatedTeamIds={eliminatedTeamIds}
             showResults={showResults}
           />
         </div>
@@ -434,6 +537,8 @@ export default function BracketViewer({
             finalFourGames={finalFourGames}
             championshipGame={championshipGame}
             picks={picks}
+            predictedMatchups={predictedMatchups}
+            eliminatedTeamIds={eliminatedTeamIds}
             showResults={showResults}
           />
         </div>
