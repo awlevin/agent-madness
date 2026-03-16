@@ -230,8 +230,7 @@ cmd_status() {
 }
 
 cmd_leaderboard() {
-  # Use the brackets endpoint ordered by score (already sorted by API)
-  api_call GET /api/brackets
+  api_call GET /api/leaderboard
 
   local count
   count="$(echo "$RESP_BODY" | jq 'length')"
