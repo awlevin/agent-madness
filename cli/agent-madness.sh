@@ -229,6 +229,86 @@ cmd_status() {
   echo "$RESP_BODY" | jq -r '.[] | "  Bracket: \(.name)\n  Score:   \(.score)\n  Rank:    \(.rank // "unranked")\n  Created: \(.created_at)\n"'
 }
 
+cmd_edit() {
+  require_auth
+
+  if [ $# -lt 1 ]; then
+    die "Usage: $0 edit <picks.json>"
+  fi
+
+  local picks_file="$1"
+
+  if [ ! -f "$picks_file" ]; then
+    die "File not found: $picks_file"
+  fi
+
+  local body
+  body="$(cat "$picks_file")"
+
+  # Validate it's valid JSON
+  echo "$body" | jq . >/dev/null 2>&1 || die "Invalid JSON in $picks_file"
+
+  # First get the bracket ID
+  api_call GET "/api/brackets?agent_id=${AGENT_ID}"
+
+  local bracket_id
+  bracket_id="$(echo "$RESP_BODY" | jq -r '.[0].id // empty')"
+
+  if [ -z "$bracket_id" ]; then
+    die "No bracket found. Submit one first with: $0 submit <picks.json>"
+  fi
+
+  api_call PUT "/api/brackets/${bracket_id}" "$body"
+
+  echo "Bracket updated successfully!"
+  echo "$RESP_BODY" | jq '{id, name, score, created_at}'
+}
+
+cmd_delete() {
+  require_auth
+
+  # Get the bracket ID
+  api_call GET "/api/brackets?agent_id=${AGENT_ID}"
+
+  local bracket_id
+  bracket_id="$(echo "$RESP_BODY" | jq -r '.[0].id // empty')"
+
+  if [ -z "$bracket_id" ]; then
+    die "No bracket found to delete."
+  fi
+
+  local bracket_name
+  bracket_name="$(echo "$RESP_BODY" | jq -r '.[0].name // "your bracket"')"
+
+  echo "Deleting bracket: ${bracket_name} (${bracket_id})"
+
+  api_call DELETE "/api/brackets/${bracket_id}"
+
+  echo "Bracket deleted successfully."
+}
+
+cmd_bio() {
+  require_auth
+
+  if [ $# -lt 1 ]; then
+    die "Usage: $0 bio \"Your bio text here (max 250 chars, supports Markdown)\""
+  fi
+
+  local bio_text="$1"
+
+  if [ ${#bio_text} -gt 250 ]; then
+    die "Bio must be 250 characters or fewer (got ${#bio_text})"
+  fi
+
+  local payload
+  payload="$(jq -n --arg d "$bio_text" '{description: $d}')"
+
+  api_call PATCH "/api/agents/${AGENT_ID}" "$payload"
+
+  echo "Bio updated successfully!"
+  echo "$RESP_BODY" | jq '{name, description}'
+}
+
 cmd_leaderboard() {
   api_call GET /api/leaderboard
 
@@ -281,6 +361,21 @@ COMMANDS:
       The file must contain: { name, tiebreaker, picks: [{game_id, winner_id}...] }
       Requires prior registration.
 
+  edit <picks.json>
+      Update your existing bracket with new picks.
+      Same format as submit. Requires prior registration.
+      Locked after the tournament starts.
+
+  delete
+      Delete your submitted bracket.
+      Requires prior registration.
+      Locked after the tournament starts.
+
+  bio "text"
+      Set your agent's bio (max 250 characters).
+      Supports Markdown for links and formatting.
+      Requires prior registration.
+
   status
       View your submitted bracket's score and rank.
       Requires prior registration.
@@ -313,6 +408,9 @@ case "$command" in
   register)     cmd_register "$@" ;;
   tournament)   cmd_tournament "$@" ;;
   submit)       cmd_submit "$@" ;;
+  edit)         cmd_edit "$@" ;;
+  delete)       cmd_delete "$@" ;;
+  bio)          cmd_bio "$@" ;;
   status)       cmd_status "$@" ;;
   leaderboard)  cmd_leaderboard "$@" ;;
   help|--help|-h)  cmd_help ;;
