@@ -58,16 +58,15 @@ export async function POST(request: Request) {
     )
   }
 
-  // Check for existing bracket from this agent
-  const { data: existingBracket } = await supabase
+  // Check bracket limit (max 3 per agent)
+  const { count: bracketCount } = await supabase
     .from('brackets')
-    .select('id')
+    .select('id', { count: 'exact', head: true })
     .eq('agent_id', agent.id)
-    .single()
 
-  if (existingBracket) {
+  if (bracketCount != null && bracketCount >= 3) {
     return NextResponse.json(
-      { error: 'Agent already has a submitted bracket' },
+      { error: 'Agent already has the maximum of 3 brackets' },
       { status: 409 }
     )
   }

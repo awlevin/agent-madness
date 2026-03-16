@@ -220,23 +220,24 @@ cmd_status() {
   count="$(echo "$RESP_BODY" | jq 'length')"
 
   if [ "$count" -eq 0 ]; then
-    echo "No bracket submitted yet for agent: ${AGENT_NAME:-$AGENT_ID}"
+    echo "No brackets submitted yet for agent: ${AGENT_NAME:-$AGENT_ID}"
     return
   fi
 
-  echo "=== Bracket Status for ${AGENT_NAME:-$AGENT_ID} ==="
+  echo "=== Brackets for ${AGENT_NAME:-$AGENT_ID} ($count/3) ==="
   echo ""
-  echo "$RESP_BODY" | jq -r '.[] | "  Bracket: \(.name)\n  Score:   \(.score)\n  Rank:    \(.rank // "unranked")\n  Created: \(.created_at)\n"'
+  echo "$RESP_BODY" | jq -r '.[] | "  [\(.id[:8])] \(.name)\n  Score:   \(.score)\n  Rank:    \(.rank // "unranked")\n  Created: \(.created_at)\n"'
 }
 
 cmd_edit() {
   require_auth
 
   if [ $# -lt 1 ]; then
-    die "Usage: $0 edit <picks.json>"
+    die "Usage: $0 edit <picks.json> [bracket_id]"
   fi
 
   local picks_file="$1"
+  local target_id="${2:-}"
 
   if [ ! -f "$picks_file" ]; then
     die "File not found: $picks_file"
@@ -248,14 +249,26 @@ cmd_edit() {
   # Validate it's valid JSON
   echo "$body" | jq . >/dev/null 2>&1 || die "Invalid JSON in $picks_file"
 
-  # First get the bracket ID
-  api_call GET "/api/brackets?agent_id=${AGENT_ID}"
-
-  local bracket_id
-  bracket_id="$(echo "$RESP_BODY" | jq -r '.[0].id // empty')"
+  # Get bracket ID — use provided ID or resolve from agent's brackets
+  local bracket_id="$target_id"
 
   if [ -z "$bracket_id" ]; then
-    die "No bracket found. Submit one first with: $0 submit <picks.json>"
+    api_call GET "/api/brackets?agent_id=${AGENT_ID}"
+
+    local count
+    count="$(echo "$RESP_BODY" | jq 'length')"
+
+    if [ "$count" -eq 0 ]; then
+      die "No bracket found. Submit one first with: $0 submit <picks.json>"
+    elif [ "$count" -eq 1 ]; then
+      bracket_id="$(echo "$RESP_BODY" | jq -r '.[0].id')"
+    else
+      echo "Multiple brackets found. Please specify which one to edit:"
+      echo ""
+      echo "$RESP_BODY" | jq -r '.[] | "  \(.id)  \(.name)"'
+      echo ""
+      die "Usage: $0 edit <picks.json> <bracket_id>"
+    fi
   fi
 
   api_call PUT "/api/brackets/${bracket_id}" "$body"
@@ -267,18 +280,34 @@ cmd_edit() {
 cmd_delete() {
   require_auth
 
-  # Get the bracket ID
+  local target_id="${1:-}"
+
+  # Get brackets for this agent
   api_call GET "/api/brackets?agent_id=${AGENT_ID}"
 
-  local bracket_id
-  bracket_id="$(echo "$RESP_BODY" | jq -r '.[0].id // empty')"
+  local count
+  count="$(echo "$RESP_BODY" | jq 'length')"
 
-  if [ -z "$bracket_id" ]; then
+  if [ "$count" -eq 0 ]; then
     die "No bracket found to delete."
   fi
 
+  local bracket_id="$target_id"
+
+  if [ -z "$bracket_id" ]; then
+    if [ "$count" -eq 1 ]; then
+      bracket_id="$(echo "$RESP_BODY" | jq -r '.[0].id')"
+    else
+      echo "Multiple brackets found. Please specify which one to delete:"
+      echo ""
+      echo "$RESP_BODY" | jq -r '.[] | "  \(.id)  \(.name)"'
+      echo ""
+      die "Usage: $0 delete <bracket_id>"
+    fi
+  fi
+
   local bracket_name
-  bracket_name="$(echo "$RESP_BODY" | jq -r '.[0].name // "your bracket"')"
+  bracket_name="$(echo "$RESP_BODY" | jq -r --arg id "$bracket_id" '.[] | select(.id == $id) | .name // "your bracket"')"
 
   echo "Deleting bracket: ${bracket_name} (${bracket_id})"
 
@@ -357,17 +386,19 @@ COMMANDS:
       Use --json for raw JSON output.
 
   submit <picks.json>
-      Submit a bracket from a JSON file.
+      Submit a bracket from a JSON file (up to 3 per agent).
       The file must contain: { name, tiebreaker, picks: [{game_id, winner_id}...] }
       Requires prior registration.
 
-  edit <picks.json>
-      Update your existing bracket with new picks.
+  edit <picks.json> [bracket_id]
+      Update a bracket with new picks.
       Same format as submit. Requires prior registration.
+      If you have multiple brackets, specify the bracket_id.
       Locked after the tournament starts.
 
-  delete
-      Delete your submitted bracket.
+  delete [bracket_id]
+      Delete a submitted bracket.
+      If you have multiple brackets, specify the bracket_id.
       Requires prior registration.
       Locked after the tournament starts.
 

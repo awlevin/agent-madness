@@ -113,8 +113,8 @@ export default async function AgentProfilePage({ params }: AgentProfileProps) {
     notFound();
   }
 
-  // Fetch bracket with picks (joined with predicted_winner team)
-  const { data: brackets } = await supabase
+  // Fetch all brackets with picks (joined with predicted_winner team)
+  const { data: bracketsData } = await supabase
     .from("brackets")
     .select(
       `
@@ -126,30 +126,22 @@ export default async function AgentProfilePage({ params }: AgentProfileProps) {
     `
     )
     .eq("agent_id", id)
-    .limit(1);
+    .order("score", { ascending: false });
 
-  const bracket = brackets?.[0] as
-    | (Bracket & { picks: (BracketPick & { predicted_winner: Team })[] })
-    | undefined;
+  type BracketWithPicks = Bracket & { picks: (BracketPick & { predicted_winner: Team })[] };
+  const agentBrackets = (bracketsData ?? []) as BracketWithPicks[];
 
-  // Fetch games for round mapping if bracket exists
-  let roundAccuracies: RoundAccuracy[] = [];
-  if (bracket?.picks && bracket.picks.length > 0) {
-    const { data: games } = await supabase
+  // Fetch games for round mapping if any bracket has picks
+  let games: Game[] = [];
+  if (agentBrackets.some((b) => b.picks?.length > 0)) {
+    const { data: gamesData } = await supabase
       .from("games")
       .select("id, round");
-
-    if (games) {
-      roundAccuracies = computeRoundAccuracies(
-        bracket.picks,
-        games as Game[]
-      );
+    if (gamesData) {
+      games = gamesData as Game[];
     }
   }
 
-  const correctPicks =
-    bracket?.picks?.filter((p) => p.is_correct === true).length ?? 0;
-  const totalPicks = bracket?.picks?.length ?? 0;
   const joinDate = new Date(agent.created_at).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
@@ -191,82 +183,96 @@ export default async function AgentProfilePage({ params }: AgentProfileProps) {
           </div>
         </div>
 
-        {/* Bracket content */}
-        {bracket ? (
-          <>
-            {/* Stats Row */}
-            <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {[
-                { label: "Score", value: bracket.score.toLocaleString() },
-                {
-                  label: "Rank",
-                  value: bracket.rank ? `#${bracket.rank}` : "--",
-                },
-                {
-                  label: "Correct Picks",
-                  value: `${correctPicks}/${totalPicks}`,
-                },
-                {
-                  label: "Max Possible",
-                  value: bracket.max_possible_score.toLocaleString(),
-                },
-              ].map((stat) => (
-                <div
-                  key={stat.label}
-                  className="rounded-xl border border-white/5 bg-bg-card p-4 text-center"
-                >
-                  <p className="text-2xl font-bold text-court-orange">
-                    {stat.value}
-                  </p>
-                  <p className="mt-1 text-xs font-medium text-text-secondary">
-                    {stat.label}
-                  </p>
-                </div>
-              ))}
-            </div>
+        {/* Brackets */}
+        {agentBrackets.length > 0 ? (
+          <div className="mt-8 space-y-10">
+            {agentBrackets.map((bracket) => {
+              const correctPicks = bracket.picks?.filter((p) => p.is_correct === true).length ?? 0;
+              const totalPicks = bracket.picks?.length ?? 0;
+              const roundAccuracies = games.length > 0 && bracket.picks?.length > 0
+                ? computeRoundAccuracies(bracket.picks, games)
+                : [];
 
-            {/* Per-Round Accuracy */}
-            {roundAccuracies.length > 0 && (
-              <section className="mt-10">
-                <h2 className="text-lg font-semibold text-text-primary">
-                  Per-Round Accuracy
-                </h2>
-                <div className="mt-4 space-y-3">
-                  {roundAccuracies.map(({ round, correct, total }) => {
-                    const pct = total > 0 ? (correct / total) * 100 : 0;
-                    return (
-                      <div key={round}>
-                        <div className="mb-1 flex items-center justify-between text-sm">
-                          <span className="font-medium text-text-primary">
-                            {ROUND_NAMES[round]}
-                          </span>
-                          <span className="text-text-secondary">
-                            {correct}/{total} ({ROUND_POINTS[round]} pts each)
-                          </span>
-                        </div>
-                        <div className="h-3 overflow-hidden rounded-full bg-white/5">
-                          <div
-                            className="h-full rounded-full bg-court-orange transition-all"
-                            style={{ width: `${pct}%` }}
-                          />
-                        </div>
+              return (
+                <section key={bracket.id} className="rounded-xl border border-white/5 bg-bg-card/50 p-6">
+                  <h2 className="text-lg font-semibold text-text-primary">{bracket.name}</h2>
+
+                  {/* Stats Row */}
+                  <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                    {[
+                      { label: "Score", value: bracket.score.toLocaleString() },
+                      {
+                        label: "Rank",
+                        value: bracket.rank ? `#${bracket.rank}` : "--",
+                      },
+                      {
+                        label: "Correct Picks",
+                        value: `${correctPicks}/${totalPicks}`,
+                      },
+                      {
+                        label: "Max Possible",
+                        value: bracket.max_possible_score.toLocaleString(),
+                      },
+                    ].map((stat) => (
+                      <div
+                        key={stat.label}
+                        className="rounded-xl border border-white/5 bg-bg-card p-4 text-center"
+                      >
+                        <p className="text-2xl font-bold text-court-orange">
+                          {stat.value}
+                        </p>
+                        <p className="mt-1 text-xs font-medium text-text-secondary">
+                          {stat.label}
+                        </p>
                       </div>
-                    );
-                  })}
-                </div>
-              </section>
-            )}
+                    ))}
+                  </div>
 
-            {/* View Full Bracket Link */}
-            <div className="mt-10">
-              <Link
-                href={`/brackets/${bracket.id}`}
-                className="inline-flex items-center rounded-lg bg-court-orange px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-court-orange/20 transition-all duration-200 hover:bg-court-orange/90 hover:shadow-xl hover:shadow-court-orange/30"
-              >
-                View Full Bracket
-              </Link>
-            </div>
-          </>
+                  {/* Per-Round Accuracy */}
+                  {roundAccuracies.length > 0 && (
+                    <div className="mt-6">
+                      <h3 className="text-sm font-semibold text-text-primary">
+                        Per-Round Accuracy
+                      </h3>
+                      <div className="mt-3 space-y-3">
+                        {roundAccuracies.map(({ round, correct, total }) => {
+                          const pct = total > 0 ? (correct / total) * 100 : 0;
+                          return (
+                            <div key={round}>
+                              <div className="mb-1 flex items-center justify-between text-sm">
+                                <span className="font-medium text-text-primary">
+                                  {ROUND_NAMES[round]}
+                                </span>
+                                <span className="text-text-secondary">
+                                  {correct}/{total} ({ROUND_POINTS[round]} pts each)
+                                </span>
+                              </div>
+                              <div className="h-3 overflow-hidden rounded-full bg-white/5">
+                                <div
+                                  className="h-full rounded-full bg-court-orange transition-all"
+                                  style={{ width: `${pct}%` }}
+                                />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* View Full Bracket Link */}
+                  <div className="mt-6">
+                    <Link
+                      href={`/brackets/${bracket.id}`}
+                      className="inline-flex items-center rounded-lg bg-court-orange px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-court-orange/20 transition-all duration-200 hover:bg-court-orange/90 hover:shadow-xl hover:shadow-court-orange/30"
+                    >
+                      View Full Bracket
+                    </Link>
+                  </div>
+                </section>
+              );
+            })}
+          </div>
         ) : (
           <div className="mt-10 rounded-xl border border-white/5 bg-bg-card p-8 text-center">
             <p className="text-text-secondary">

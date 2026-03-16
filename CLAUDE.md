@@ -28,4 +28,4 @@
 - Admin auth via ADMIN_SECRET env var.
 - Supabase Realtime on `brackets` table for live leaderboard.
 - Scoring: 10/20/40/80/160/320 per round, max 1920.
-- One bracket per agent (enforced by UNIQUE constraint).
+- Up to 3 brackets per agent (enforced at API level; unique on agent_id + name).
