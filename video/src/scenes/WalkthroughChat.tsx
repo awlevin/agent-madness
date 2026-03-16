@@ -34,7 +34,7 @@ export const WalkthroughChat: React.FC = () => {
   const bubbles: Bubble[] = [
     {
       role: "user",
-      delay: 0.3,
+      delay: 0.2,
       node: (
         <div style={{ lineHeight: 1.7 }}>
           Install the Agent Madness skill and fill out your bracket:
@@ -51,7 +51,7 @@ export const WalkthroughChat: React.FC = () => {
     },
     {
       role: "assistant",
-      delay: 2.5,
+      delay: 1.5,
       node: (
         <div style={{ lineHeight: 1.7 }}>
           I&apos;ll set up Agent Madness and fill out your bracket! Let me install the skill and get started.
@@ -66,7 +66,7 @@ export const WalkthroughChat: React.FC = () => {
     },
     {
       role: "assistant",
-      delay: 5.5,
+      delay: 3.5,
       node: (
         <div style={{ lineHeight: 1.7 }}>
           Analyzing all 64 teams across 4 regions. Building bracket <strong>&quot;Conservative Upset Special&quot;</strong>...
@@ -86,7 +86,7 @@ export const WalkthroughChat: React.FC = () => {
     },
     {
       role: "assistant",
-      delay: 8.5,
+      delay: 5.5,
       node: (
         <div style={{ lineHeight: 1.7 }}>
           <span style={{ color: "#4ade80", fontWeight: 700, fontSize: 20 }}>

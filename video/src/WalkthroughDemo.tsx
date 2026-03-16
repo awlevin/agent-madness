@@ -16,48 +16,48 @@ export const WalkthroughDemo: React.FC = () => {
   return (
     <AbsoluteFill style={{ backgroundColor: "#0a0a14" }}>
       <TransitionSeries>
-        {/* Scene 0: Intro title (2.5s) */}
-        <TransitionSeries.Sequence durationInFrames={Math.floor(2.5 * fps)}>
+        {/* Scene 0: Intro title (2s) */}
+        <TransitionSeries.Sequence durationInFrames={Math.floor(2 * fps)}>
           <IntroScene />
         </TransitionSeries.Sequence>
 
         <TransitionSeries.Transition
-          presentation={fade()}
-          timing={linearTiming({ durationInFrames: 20 })}
+          presentation={slide({ direction: "from-bottom" })}
+          timing={linearTiming({ durationInFrames: 12 })}
         />
 
-        {/* Scene 1: Homepage — user clicks Copy (4.5s) */}
-        <TransitionSeries.Sequence durationInFrames={Math.floor(4.5 * fps)}>
+        {/* Scene 1: Homepage — user clicks Copy (3s) */}
+        <TransitionSeries.Sequence durationInFrames={Math.floor(3 * fps)}>
           <WalkthroughHomepage />
         </TransitionSeries.Sequence>
 
         <TransitionSeries.Transition
           presentation={slide({ direction: "from-right" })}
-          timing={linearTiming({ durationInFrames: 12 })}
+          timing={linearTiming({ durationInFrames: 10 })}
         />
 
-        {/* Scene 2: Chat — paste instructions, agent works, submits bracket (11s) */}
-        <TransitionSeries.Sequence durationInFrames={Math.floor(11 * fps)}>
+        {/* Scene 2: Chat — paste instructions, agent works, submits bracket (7s) */}
+        <TransitionSeries.Sequence durationInFrames={Math.floor(7 * fps)}>
           <WalkthroughChat />
         </TransitionSeries.Sequence>
 
         <TransitionSeries.Transition
           presentation={fade()}
-          timing={linearTiming({ durationInFrames: 15 })}
+          timing={linearTiming({ durationInFrames: 12 })}
         />
 
-        {/* Scene 3: Browser — view the bracket (7s) */}
-        <TransitionSeries.Sequence durationInFrames={Math.floor(7 * fps)}>
+        {/* Scene 3: Browser — view the bracket (4.5s) */}
+        <TransitionSeries.Sequence durationInFrames={Math.floor(4.5 * fps)}>
           <WalkthroughBracketView />
         </TransitionSeries.Sequence>
 
         <TransitionSeries.Transition
           presentation={fade()}
-          timing={linearTiming({ durationInFrames: 15 })}
+          timing={linearTiming({ durationInFrames: 12 })}
         />
 
-        {/* Scene 4: Leaderboard (6s) */}
-        <TransitionSeries.Sequence durationInFrames={Math.floor(6 * fps)}>
+        {/* Scene 4: Leaderboard (4s) */}
+        <TransitionSeries.Sequence durationInFrames={Math.floor(4 * fps)}>
           <WalkthroughLeaderboard />
         </TransitionSeries.Sequence>
       </TransitionSeries>
@@ -73,7 +73,7 @@ export const WalkthroughDemo: React.FC = () => {
           });
           const fadeOut = interpolate(
             f,
-            [28 * fps, 30 * fps],
+            [18 * fps, 20 * fps],
             [0.4, 0],
             { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
           );

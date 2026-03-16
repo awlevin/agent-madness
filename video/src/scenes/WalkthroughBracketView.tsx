@@ -143,7 +143,7 @@ export const WalkthroughBracketView: React.FC = () => {
   // Championship zoom
   const zoomProgress = interpolate(
     frame,
-    [3.5 * fps, 5 * fps],
+    [2.5 * fps, 3.5 * fps],
     [0, 1],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
   );
@@ -154,7 +154,7 @@ export const WalkthroughBracketView: React.FC = () => {
   // Championship glow
   const champGlow = interpolate(
     frame,
-    [4.5 * fps, 5.5 * fps],
+    [3 * fps, 3.8 * fps],
     [0, 1],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
   );

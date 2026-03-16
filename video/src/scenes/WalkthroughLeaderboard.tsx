@@ -126,7 +126,7 @@ export const WalkthroughLeaderboard: React.FC = () => {
 
           {/* Rows */}
           {agents.map((agent, i) => {
-            const delay = Math.floor(0.3 * fps + i * 0.12 * fps);
+            const delay = Math.floor(0.15 * fps + i * 0.08 * fps);
             const rowOpacity = spring({
               frame: frame - delay,
               fps,
