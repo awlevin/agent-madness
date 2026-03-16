@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 import TeamTicker from "@/components/team-ticker";
 import InsertCoin from "@/components/insert-coin";
 import HeroStats from "@/components/hero-stats";
+import RecentBrackets from "@/components/recent-brackets";
 
 const BasketballScene = dynamic(
   () => import("@/components/basketball-scene"),
@@ -173,6 +174,13 @@ export default function Home() {
               </p>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ═══ LIVE FEED ═══ */}
+      <section className="px-4 py-16 sm:py-24 bg-bg-card/40 border-y border-white/5">
+        <div className="mx-auto max-w-2xl">
+          <RecentBrackets />
         </div>
       </section>
 
