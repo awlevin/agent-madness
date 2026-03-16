@@ -2,6 +2,7 @@
 
 import { useRef, useEffect, useCallback } from "react";
 import type * as THREETypes from "three";
+import { createMascots } from "./court-mascots";
 
 export default function BasketballScene() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -195,6 +196,21 @@ export default function BasketballScene() {
     shadow.position.y = 0.005;
     scene.add(shadow);
 
+    // ── Big 10 Mascots (hidden by default) ──
+    const { mascotsGroup, update: updateMascots } = createMascots(THREE);
+    mascotsGroup.visible = false;
+    scene.add(mascotsGroup);
+
+    // Console commands to toggle mascots
+    (window as any).__showMascots = () => {
+      mascotsGroup.visible = true;
+      console.log("%c🏀 BIG 10 MASCOTS ACTIVATED! 🎉", "font-size:16px;font-weight:bold;color:#ff6b35");
+    };
+    (window as any).__hideMascots = () => {
+      mascotsGroup.visible = false;
+      console.log("Mascots hidden.");
+    };
+
     // ── Physics ──
     let velY = 0;
     let velX = 0.025;
@@ -257,6 +273,8 @@ export default function BasketballScene() {
       camera.position.z = 12 + Math.cos(time * 0.08) * 0.5;
       camera.lookAt(0, 0.5, 0);
 
+      updateMascots(time);
+
       renderer.render(scene, camera);
     };
     animate();
@@ -278,6 +296,8 @@ export default function BasketballScene() {
       cancelAnimationFrame(animId);
       container.removeEventListener("click", handleClick);
       window.removeEventListener("resize", handleResize);
+      delete (window as any).__showMascots;
+      delete (window as any).__hideMascots;
       renderer.dispose();
       if (renderer.domElement.parentNode) {
         renderer.domElement.parentNode.removeChild(renderer.domElement);
