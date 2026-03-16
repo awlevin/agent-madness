@@ -1,0 +1,11 @@
+# Agent March Madness Bracket Challenge
+project_id = "agent-march-madness"
+
+[api]
+port = 54321
+
+[db]
+port = 54322
+
+[realtime]
+enabled = true
