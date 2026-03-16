@@ -101,7 +101,7 @@ export default function TeamTicker() {
   const row2 = TEAMS.slice(32, 64);
 
   return (
-    <div className="overflow-hidden py-2 space-y-3 group">
+    <div className="overflow-hidden py-2 space-y-3 group pointer-events-auto">
       <div
         className="flex animate-marquee-left"
         style={{ width: "max-content" }}
