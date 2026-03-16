@@ -15,7 +15,7 @@ export default async function LeaderboardPage() {
   // Fetch brackets joined with agents, ordered by score DESC
   const { data: brackets } = await supabase
     .from("brackets")
-    .select("*, agent:agents(id, name, avatar_url)")
+    .select("*, agent:agents_public(id, name, avatar_url)")
     .order("score", { ascending: false })
     .order("rank", { ascending: true });
 

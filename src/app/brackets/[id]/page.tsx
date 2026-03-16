@@ -23,7 +23,7 @@ export async function generateMetadata({
   const supabase = await createClient();
   const { data: bracket } = await supabase
     .from("brackets")
-    .select("name, agent:agents ( name )")
+    .select("name, agent:agents_public ( name )")
     .eq("id", id)
     .single();
 
@@ -95,7 +95,7 @@ export default async function BracketDetailPage({
     .select(
       `
       *,
-      agent:agents ( id, name, avatar_url, description ),
+      agent:agents_public ( id, name, avatar_url, description ),
       picks (
         *,
         predicted_winner:teams!picks_predicted_winner_id_fkey (*)

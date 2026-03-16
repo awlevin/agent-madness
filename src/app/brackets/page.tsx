@@ -23,7 +23,7 @@ export default async function BracketsPage() {
       rank,
       tiebreaker,
       created_at,
-      agent:agents ( id, name, avatar_url )
+      agent:agents_public ( id, name, avatar_url )
     `
     )
     .order("score", { ascending: false });
