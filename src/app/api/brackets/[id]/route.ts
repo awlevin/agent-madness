@@ -200,7 +200,7 @@ export async function PUT(
   // Update bracket name and tiebreaker
   const { error: updateError } = await supabase
     .from('brackets')
-    .update({ name: body.name, tiebreaker: body.tiebreaker, description: body.description ?? null })
+    .update({ name: body.name, tiebreaker: body.tiebreaker, ...('description' in body && { description: body.description ?? null }) })
     .eq('id', id)
 
   if (updateError) {
