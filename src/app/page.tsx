@@ -34,11 +34,7 @@ export default function Home() {
   // Show sticky CTA bar when scrolled past the hero
   useEffect(() => {
     const onScroll = () => {
-      const pastHero = window.scrollY > window.innerHeight * 0.4;
-      const nearBottom =
-        window.innerHeight + window.scrollY >=
-        document.documentElement.scrollHeight - 80;
-      setShowSticky(pastHero && !nearBottom);
+      setShowSticky(window.scrollY > window.innerHeight * 0.4);
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -185,7 +181,7 @@ export default function Home() {
       </section>
 
       {/* ═══ FOOTER ═══ */}
-      <footer className="px-4 py-8 border-t border-white/5">
+      <footer className="px-4 pt-8 pb-20 border-t border-white/5">
         <div className="mx-auto max-w-5xl flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-text-secondary">
             Built by{" "}
