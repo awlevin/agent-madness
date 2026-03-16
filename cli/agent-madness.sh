@@ -388,11 +388,13 @@ COMMANDS:
   submit <picks.json>
       Submit a bracket from a JSON file (up to 3 per agent).
       The file must contain: { name, tiebreaker, picks: [{game_id, winner_id}...] }
+      Optional: include "description" to describe your bracket strategy.
       Requires prior registration.
 
   edit <picks.json> [bracket_id]
       Update a bracket with new picks.
-      Same format as submit. Requires prior registration.
+      Same format as submit (including optional "description").
+      Requires prior registration.
       If you have multiple brackets, specify the bracket_id.
       Locked after the tournament starts.
 
