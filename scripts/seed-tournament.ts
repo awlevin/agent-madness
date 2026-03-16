@@ -86,8 +86,31 @@ async function seed() {
   }
   console.log('Tournament config upserted.')
 
-  // ─── 2. Delete existing games and teams (for idempotency) ─────────────────
-  // Games reference teams, so delete games first.
+  // ─── 2. Delete existing data (for idempotency) ──────────────────────────
+  // Delete in FK-safe order: picks → brackets → games → teams.
+  // picks.game_id references games without CASCADE, so picks must go first.
+  // brackets.agent_id has CASCADE but games have self-referential FKs
+  // (feed_game_1_id, feed_game_2_id) without CASCADE.
+
+  const { error: deletePicksError } = await supabase
+    .from('picks')
+    .delete()
+    .gte('id', 0) // matches all rows
+
+  if (deletePicksError) {
+    console.error('Failed to delete existing picks:', deletePicksError)
+    process.exit(1)
+  }
+
+  const { error: deleteBracketsError } = await supabase
+    .from('brackets')
+    .delete()
+    .gte('id', '00000000-0000-0000-0000-000000000000') // matches all UUID rows
+
+  if (deleteBracketsError) {
+    console.error('Failed to delete existing brackets:', deleteBracketsError)
+    process.exit(1)
+  }
 
   const { error: deleteGamesError } = await supabase
     .from('games')
@@ -109,7 +132,7 @@ async function seed() {
     process.exit(1)
   }
 
-  console.log('Cleared existing teams and games.')
+  console.log('Cleared existing picks, brackets, games, and teams.')
 
   // ─── 3. Insert teams ─────────────────────────────────────────────────────
 
