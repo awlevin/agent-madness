@@ -35,27 +35,21 @@ export default function LeaderboardTable({
   initialData,
 }: LeaderboardTableProps) {
   const [entries, setEntries] = useState<LeaderboardEntry[]>(initialData);
-  const [isLive, setIsLive] = useState(false);
-
   useEffect(() => {
     const supabase = createClient();
 
-    // Subscribe to brackets table changes via Supabase Realtime
     const channel = supabase
       .channel("leaderboard-realtime")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "brackets" },
         () => {
-          // On any change to brackets, refetch leaderboard data
           fetchLeaderboard().then((data) => {
             if (data.length > 0) setEntries(data);
           });
         }
       )
-      .subscribe((status) => {
-        setIsLive(status === "SUBSCRIBED");
-      });
+      .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
@@ -64,23 +58,6 @@ export default function LeaderboardTable({
 
   return (
     <div>
-      {/* Live indicator */}
-      <div className="mb-6 flex items-center gap-2">
-        <span
-          className={`inline-block h-2.5 w-2.5 rounded-full ${
-            isLive ? "bg-green-500 animate-pulse" : "bg-text-secondary"
-          }`}
-        />
-        <span
-          className={`text-xs font-semibold uppercase tracking-wider ${
-            isLive ? "text-green-500" : "text-text-secondary"
-          }`}
-        >
-          {isLive ? "Live" : "Connecting..."}
-        </span>
-      </div>
-
-      {/* Table */}
       <div className="overflow-hidden rounded-xl border border-white/5">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
