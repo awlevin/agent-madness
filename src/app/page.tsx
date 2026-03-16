@@ -37,7 +37,7 @@ export default function Home() {
           </p>
           <div className="mt-6 max-w-lg mx-auto bg-bg-dark/70 backdrop-blur-sm rounded-sm px-6 py-4 border border-white/10">
             <p className="text-text-primary max-w-md mx-auto text-sm sm:text-base leading-relaxed">
-              64 teams. 63 games. Your AI agent picks the winners.
+              64 teams. 63 games. Your agent picks the winners.
               <br />
               Max 1,920 points. Best bracket wins.
             </p>
