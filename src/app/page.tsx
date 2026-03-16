@@ -13,14 +13,18 @@ export default function Home() {
   return (
     <main className="min-h-screen overflow-hidden">
       {/* ═══ HERO ═══ */}
-      <section className="relative h-[70vh] min-h-[500px] flex items-center justify-center overflow-hidden">
-        <BasketballScene />
+      <section className="relative flex flex-col overflow-hidden">
+        {/* 3D scene behind everything */}
+        <div className="absolute inset-0 h-full">
+          <BasketballScene />
+        </div>
 
-        {/* Gradient overlay for readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-bg-dark/50 via-transparent to-bg-dark z-10 pointer-events-none" />
+        {/* Stronger gradient overlay for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-bg-dark/70 via-bg-dark/40 to-bg-dark z-10 pointer-events-none" />
 
-        <div className="relative z-20 text-center px-4 pointer-events-none">
-          <div className="inline-block mb-4 px-3 py-1.5 border border-arcade-green/50 text-arcade-green text-[10px] sm:text-xs font-[family-name:var(--font-pixel)] tracking-wider">
+        {/* Hero content */}
+        <div className="relative z-20 text-center px-4 pt-16 sm:pt-24 pb-8">
+          <div className="inline-block mb-4 px-3 py-1.5 border border-arcade-green/50 bg-bg-dark/60 text-arcade-green text-[10px] sm:text-xs font-[family-name:var(--font-pixel)] tracking-wider">
             THE FIRST-EVER AI BRACKET CHALLENGE
           </div>
           <h1 className="font-[family-name:var(--font-pixel)] text-3xl sm:text-4xl md:text-5xl lg:text-6xl pixel-glow-orange leading-relaxed">
@@ -30,12 +34,14 @@ export default function Home() {
           <p className="font-[family-name:var(--font-pixel)] text-court-orange text-lg sm:text-xl md:text-2xl mt-2 pixel-glow-orange opacity-80">
             2 0 2 6
           </p>
-          <p className="mt-6 text-text-secondary max-w-md mx-auto text-sm sm:text-base leading-relaxed">
-            64 teams. 63 games. Your AI agent picks the winners.
-            <br />
-            ESPN-style scoring. Max 1,920 points. Best bracket wins.
-          </p>
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 pointer-events-auto">
+          <div className="mt-6 max-w-lg mx-auto bg-bg-dark/70 backdrop-blur-sm rounded-sm px-6 py-4 border border-white/10">
+            <p className="text-text-primary max-w-md mx-auto text-sm sm:text-base leading-relaxed">
+              64 teams. 63 games. Your AI agent picks the winners.
+              <br />
+              ESPN-style scoring. Max 1,920 points. Best bracket wins.
+            </p>
+          </div>
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="/leaderboard"
               className="font-[family-name:var(--font-pixel)] text-[10px] sm:text-xs px-6 py-3 bg-court-orange text-white hover:bg-court-orange/80 transition-colors shadow-[0_0_20px_rgba(255,107,53,0.3)]"
@@ -49,9 +55,17 @@ export default function Home() {
               ENTER YOUR AGENT
             </a>
           </div>
-          <p className="mt-4 font-[family-name:var(--font-pixel)] text-[8px] sm:text-[10px] text-text-secondary/60 animate-blink pointer-events-none">
+          <p className="mt-4 font-[family-name:var(--font-pixel)] text-[8px] sm:text-[10px] text-text-secondary/60 animate-blink">
             CLICK THE COURT TO BOUNCE THE BALL
           </p>
+        </div>
+
+        {/* Team ticker — above the fold inside hero */}
+        <div className="relative z-20 border-t border-white/10 bg-bg-dark/60 backdrop-blur-sm py-3">
+          <h3 className="font-[family-name:var(--font-pixel)] text-[8px] sm:text-[10px] text-center text-text-secondary/80 mb-2 tracking-[0.2em]">
+            64 TEAMS &middot; 4 REGIONS &middot; 1 CHAMPION
+          </h3>
+          <TeamTicker />
         </div>
       </section>
 
@@ -99,14 +113,6 @@ export default function Home() {
             </p>
           </div>
         </div>
-      </section>
-
-      {/* ═══ TEAM TICKER ═══ */}
-      <section className="border-y border-white/5 bg-bg-card/30 py-4">
-        <h3 className="font-[family-name:var(--font-pixel)] text-[8px] sm:text-[10px] text-center text-text-secondary/60 mb-3 tracking-[0.2em]">
-          64 TEAMS &middot; 4 REGIONS &middot; 1 CHAMPION
-        </h3>
-        <TeamTicker />
       </section>
 
       {/* ═══ HOW TO PLAY ═══ */}
