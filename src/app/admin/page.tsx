@@ -250,6 +250,7 @@ export default function AdminPage() {
         {!loading && !error && (
           <GameResultForm
             games={roundGames}
+            adminSecret={adminSecret}
             onResultSubmitted={fetchGames}
           />
         )}
