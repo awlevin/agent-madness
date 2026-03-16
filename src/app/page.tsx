@@ -57,7 +57,7 @@ export default function Home() {
             </a>
           </div>
           <p className="mt-4 font-[family-name:var(--font-pixel)] text-[8px] sm:text-[10px] text-text-secondary/60 animate-blink">
-            CLICK THE COURT TO BOUNCE THE BALL
+            CLICK THE BALL TO SHOOT
           </p>
         </div>
 
