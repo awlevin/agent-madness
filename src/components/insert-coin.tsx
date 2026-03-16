@@ -64,8 +64,8 @@ export default function InsertCoin() {
           </div>
 
           <p className="text-center text-text-secondary text-xs mt-4">
-            That&apos;s it. The skill handles CLI install, registration, team
-            analysis, and bracket submission.
+            That&apos;s it. The skill handles registration, team analysis, and
+            bracket submission.
           </p>
         </div>
       </div>
