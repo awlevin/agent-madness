@@ -56,13 +56,13 @@ const BIG_TEN_MASCOTS: MascotConfig[] = [
     facing: Math.PI,
   },
   {
-    name: "Bucky",
-    bodyColor: 0xc5050c,
+    name: "NittanyLion",
+    bodyColor: 0x041e42,
     headColor: 0xffffff,
-    limbColor: 0xc5050c,
+    limbColor: 0x041e42,
     position: [2.5, 0, 7.5],
-    animation: "cheerleading",
-    facing: 0, // Face the camera
+    animation: "dance",
+    facing: Math.PI,
   },
   {
     name: "Goldy",
@@ -94,12 +94,12 @@ const BIG_TEN_MASCOTS: MascotConfig[] = [
     facing: 0,
   },
   {
-    name: "NittanyLion",
-    bodyColor: 0x041e42,
+    name: "Bucky",
+    bodyColor: 0xc5050c,
     headColor: 0xffffff,
-    limbColor: 0x041e42,
+    limbColor: 0xc5050c,
     position: [2.5, 0, -7.5],
-    animation: "dance",
+    animation: "cheerleading",
     facing: 0,
   },
   {
