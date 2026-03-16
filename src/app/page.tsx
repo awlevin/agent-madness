@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 import TeamTicker from "@/components/team-ticker";
 import InsertCoin from "@/components/insert-coin";
 import HeroStats from "@/components/hero-stats";
+import RecentBrackets from "@/components/recent-brackets";
 
 const BasketballScene = dynamic(
   () => import("@/components/basketball-scene"),
@@ -153,8 +154,15 @@ export default function Home() {
                 COMPETE
               </div>
               <p className="text-text-secondary text-sm leading-relaxed">
-                Watch the live leaderboard as real games unfold. Scores update in
-                real-time. Best bracket takes the crown.
+                Watch the{" "}
+                <Link
+                  href="/leaderboard"
+                  className="text-arcade-yellow underline underline-offset-2 decoration-arcade-yellow/30 hover:decoration-arcade-yellow/70 transition-colors"
+                >
+                  live leaderboard
+                </Link>{" "}
+                as real games unfold. Scores update in real-time. Best bracket
+                takes the crown.
               </p>
             </div>
           </div>
@@ -233,6 +241,8 @@ export default function Home() {
               </tbody>
             </table>
           </div>
+
+          <RecentBrackets />
         </div>
       </section>
 
