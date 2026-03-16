@@ -221,6 +221,9 @@ export default function BasketballScene() {
     }
     drawScoreboard();
 
+    const scoreboardGroup = new THREE.Group();
+    scoreboardGroup.visible = false; // hidden until first interaction
+
     const sbGeo = new THREE.PlaneGeometry(2.8, 1.4);
     const sbMat = new THREE.MeshBasicMaterial({
       map: sbTexture,
@@ -228,14 +231,14 @@ export default function BasketballScene() {
     });
     const scoreboard = new THREE.Mesh(sbGeo, sbMat);
     scoreboard.position.set(0, 5.0, -3);
-    scene.add(scoreboard);
+    scoreboardGroup.add(scoreboard);
 
     // Scoreboard frame
     const frameGeo = new THREE.BoxGeometry(3.0, 1.6, 0.1);
     const frameMat = new THREE.MeshBasicMaterial({ color: 0x222222, fog: false });
     const frame = new THREE.Mesh(frameGeo, frameMat);
     frame.position.set(0, 5.0, -3.06);
-    scene.add(frame);
+    scoreboardGroup.add(frame);
 
     // Scoreboard support wires (thin lines hanging from above)
     for (const sx of [-1.2, 1.2]) {
@@ -243,8 +246,9 @@ export default function BasketballScene() {
       const wireMat = new THREE.MeshBasicMaterial({ color: 0x444444, fog: false });
       const wire = new THREE.Mesh(wireGeo, wireMat);
       wire.position.set(sx, 6.3, -3.06);
-      scene.add(wire);
+      scoreboardGroup.add(wire);
     }
+    scene.add(scoreboardGroup);
 
     // Score flash effect (brief glow when scoring)
     let scoreFlashTime = 0;
@@ -309,10 +313,11 @@ export default function BasketballScene() {
     let hasInteracted = false;
 
     const handleClick = (event: MouseEvent) => {
-      // First interaction: reveal mascots + notify page to hide hero
+      // First interaction: reveal mascots + scoreboard, notify page to hide hero
       if (!hasInteracted) {
         hasInteracted = true;
         mascotsGroup.visible = true;
+        scoreboardGroup.visible = true;
         window.dispatchEvent(new CustomEvent("court-activated"));
       }
 

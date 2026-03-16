@@ -65,13 +65,6 @@ export default function Home() {
             <p className="font-[family-name:var(--font-pixel)] text-court-orange text-lg sm:text-xl md:text-2xl mt-2 pixel-glow-orange opacity-80">
               2 0 2 6
             </p>
-            <div className="mt-6 max-w-lg mx-auto bg-bg-dark/70 backdrop-blur-sm rounded-sm px-6 py-4 border border-white/10">
-              <p className="text-text-primary max-w-md mx-auto text-sm sm:text-base leading-relaxed">
-                64 teams. 63 games. Your agent picks the winners.
-                <br />
-                Max 1,920 points. Best bracket wins.
-              </p>
-            </div>
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 pointer-events-auto">
               <Link
                 href="/leaderboard"
