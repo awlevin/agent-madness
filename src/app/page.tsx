@@ -33,7 +33,11 @@ export default function Home() {
   // Show sticky CTA bar when scrolled past the hero
   useEffect(() => {
     const onScroll = () => {
-      setShowSticky(window.scrollY > window.innerHeight * 0.4);
+      const pastHero = window.scrollY > window.innerHeight * 0.4;
+      const nearBottom =
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 80;
+      setShowSticky(pastHero && !nearBottom);
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
