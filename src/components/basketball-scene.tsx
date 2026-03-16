@@ -506,7 +506,8 @@ export default function BasketballScene() {
       camera.updateProjectionMatrix();
       renderer.setSize(
         Math.floor(w / PIXEL_RATIO),
-        Math.floor(h / PIXEL_RATIO)
+        Math.floor(h / PIXEL_RATIO),
+        false
       );
     };
     window.addEventListener("resize", handleResize);
