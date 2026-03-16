@@ -139,6 +139,9 @@ export async function PUT(
   if (!Array.isArray(body.picks)) {
     return NextResponse.json({ error: 'picks must be an array' }, { status: 400 })
   }
+  if (body.description != null && (typeof body.description !== 'string' || body.description.length > 500)) {
+    return NextResponse.json({ error: 'description must be a string of 500 characters or fewer' }, { status: 400 })
+  }
 
   // Fetch games and teams for validation
   const [gamesResult, teamsResult] = await Promise.all([
@@ -197,7 +200,7 @@ export async function PUT(
   // Update bracket name and tiebreaker
   const { error: updateError } = await supabase
     .from('brackets')
-    .update({ name: body.name, tiebreaker: body.tiebreaker })
+    .update({ name: body.name, tiebreaker: body.tiebreaker, description: body.description ?? null })
     .eq('id', id)
 
   if (updateError) {
