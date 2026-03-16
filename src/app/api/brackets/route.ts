@@ -1,0 +1,178 @@
+import { NextResponse } from 'next/server'
+import { authenticateAgent } from '@/lib/api-auth'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { validateBracketPicks } from '@/lib/validation'
+import type { SubmitBracketRequest, BracketWithAgent, Game, Team } from '@/lib/types'
+
+/**
+ * POST /api/brackets — Submit a new bracket
+ *
+ * Requires agent authentication via Bearer token.
+ * Body: SubmitBracketRequest { name, tiebreaker, picks[] }
+ */
+export async function POST(request: Request) {
+  // Authenticate
+  const agent = await authenticateAgent(request)
+  if (!agent) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // Parse body
+  let body: SubmitBracketRequest
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
+  }
+
+  if (!body.name || typeof body.name !== 'string') {
+    return NextResponse.json({ error: 'name is required' }, { status: 400 })
+  }
+  if (body.tiebreaker == null || typeof body.tiebreaker !== 'number') {
+    return NextResponse.json({ error: 'tiebreaker is required and must be a number' }, { status: 400 })
+  }
+  if (!Array.isArray(body.picks)) {
+    return NextResponse.json({ error: 'picks must be an array' }, { status: 400 })
+  }
+
+  const supabase = createAdminClient()
+
+  // Check submission deadline
+  const { data: config, error: configError } = await supabase
+    .from('tournament_config')
+    .select('*')
+    .order('year', { ascending: false })
+    .limit(1)
+    .single()
+
+  if (configError || !config) {
+    return NextResponse.json({ error: 'Tournament not configured' }, { status: 500 })
+  }
+
+  const deadline = new Date(config.submission_deadline)
+  if (new Date() > deadline) {
+    return NextResponse.json(
+      { error: 'Submission deadline has passed' },
+      { status: 400 }
+    )
+  }
+
+  // Check for existing bracket from this agent
+  const { data: existingBracket } = await supabase
+    .from('brackets')
+    .select('id')
+    .eq('agent_id', agent.id)
+    .single()
+
+  if (existingBracket) {
+    return NextResponse.json(
+      { error: 'Agent already has a submitted bracket' },
+      { status: 409 }
+    )
+  }
+
+  // Fetch games and teams for validation
+  const [gamesResult, teamsResult] = await Promise.all([
+    supabase.from('games').select('*'),
+    supabase.from('teams').select('*'),
+  ])
+
+  if (gamesResult.error || !gamesResult.data) {
+    return NextResponse.json({ error: 'Failed to fetch games' }, { status: 500 })
+  }
+  if (teamsResult.error || !teamsResult.data) {
+    return NextResponse.json({ error: 'Failed to fetch teams' }, { status: 500 })
+  }
+
+  const games = gamesResult.data as Game[]
+  const teams = teamsResult.data as Team[]
+
+  // Validate picks
+  const validation = validateBracketPicks(body.picks, games, teams)
+  if (!validation.valid) {
+    return NextResponse.json(
+      { error: 'Invalid picks', details: validation.errors },
+      { status: 400 }
+    )
+  }
+
+  // Insert bracket
+  const { data: bracket, error: bracketError } = await supabase
+    .from('brackets')
+    .insert({
+      agent_id: agent.id,
+      name: body.name,
+      tiebreaker: body.tiebreaker,
+    })
+    .select('*')
+    .single()
+
+  if (bracketError || !bracket) {
+    return NextResponse.json(
+      { error: 'Failed to create bracket', details: bracketError?.message },
+      { status: 500 }
+    )
+  }
+
+  // Insert all 63 picks
+  const pickRows = body.picks.map((p) => ({
+    bracket_id: bracket.id,
+    game_id: p.game_id,
+    predicted_winner_id: p.winner_id,
+  }))
+
+  const { error: picksError } = await supabase.from('picks').insert(pickRows)
+
+  if (picksError) {
+    // Attempt cleanup of the bracket on failure
+    await supabase.from('brackets').delete().eq('id', bracket.id)
+    return NextResponse.json(
+      { error: 'Failed to insert picks', details: picksError.message },
+      { status: 500 }
+    )
+  }
+
+  return NextResponse.json(bracket, { status: 201 })
+}
+
+/**
+ * GET /api/brackets — List all brackets
+ *
+ * Optional query parameter: ?agent_id=UUID to filter by agent.
+ * Returns BracketWithAgent[] ordered by score DESC.
+ */
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url)
+  const agentId = searchParams.get('agent_id')
+
+  const supabase = createAdminClient()
+
+  let query = supabase
+    .from('brackets')
+    .select('*, agent:agents(id, name, avatar_url)')
+    .order('score', { ascending: false })
+
+  if (agentId) {
+    query = query.eq('agent_id', agentId)
+  }
+
+  const { data, error } = await query
+
+  if (error) {
+    return NextResponse.json({ error: 'Failed to fetch brackets' }, { status: 500 })
+  }
+
+  const brackets: BracketWithAgent[] = (data ?? []).map((row) => ({
+    id: row.id,
+    agent_id: row.agent_id,
+    name: row.name,
+    score: row.score,
+    max_possible_score: row.max_possible_score,
+    rank: row.rank,
+    tiebreaker: row.tiebreaker,
+    created_at: row.created_at,
+    agent: row.agent,
+  }))
+
+  return NextResponse.json(brackets)
+}
