@@ -224,6 +224,7 @@ export async function GET(request: Request) {
     max_possible_score: row.max_possible_score,
     rank: row.rank,
     tiebreaker: row.tiebreaker,
+    description: row.description ?? null,
     created_at: row.created_at,
     agent: Array.isArray(row.agent) ? row.agent[0] : row.agent,
   }))
