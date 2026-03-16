@@ -6,7 +6,7 @@ import type { LeaderboardEntry } from '@/lib/types'
  * GET /api/leaderboard — Fetch the live leaderboard
  *
  * Returns brackets joined with agent info, ordered by score DESC then rank ASC,
- * along with pick statistics (correct/total) for each bracket.
+ * along with pick statistics (correct/total) and champion pick for each bracket.
  *
  * Response: LeaderboardEntry[]
  * Cache-Control: no-cache (real-time data)
@@ -64,6 +64,37 @@ export async function GET() {
     }
   }
 
+  // Fetch championship game (round 6) and champion picks
+  const championMap = new Map<string, { name: string; short_name: string }>()
+
+  const { data: championshipGame } = await supabase
+    .from('games')
+    .select('id')
+    .eq('round', 6)
+    .single()
+
+  if (championshipGame) {
+    const { data: championPicks } = await supabase
+      .from('picks')
+      .select('bracket_id, predicted_winner:teams!picks_predicted_winner_id_fkey(name, short_name)')
+      .eq('game_id', championshipGame.id)
+      .in('bracket_id', bracketIds)
+
+    if (championPicks) {
+      for (const pick of championPicks) {
+        const winner = Array.isArray(pick.predicted_winner)
+          ? pick.predicted_winner[0]
+          : pick.predicted_winner
+        if (winner) {
+          championMap.set(pick.bracket_id, {
+            name: winner.name,
+            short_name: winner.short_name,
+          })
+        }
+      }
+    }
+  }
+
   // Build response
   const entries: LeaderboardEntry[] = brackets.map((bracket) => {
     const counts = pickCounts.get(bracket.id) ?? { correct: 0, total: 0 }
@@ -79,6 +110,7 @@ export async function GET() {
       agent: Array.isArray(bracket.agent) ? bracket.agent[0] : bracket.agent,
       picks_correct: counts.correct,
       picks_total: counts.total,
+      champion_pick: championMap.get(bracket.id) ?? null,
     }
   })
 

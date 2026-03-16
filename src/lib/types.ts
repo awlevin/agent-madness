@@ -97,6 +97,7 @@ export interface BracketWithAgent extends Bracket {
 export interface LeaderboardEntry extends BracketWithAgent {
   picks_correct: number
   picks_total: number
+  champion_pick: Pick<Team, 'name' | 'short_name'> | null
 }
 
 export interface TournamentData {

@@ -46,6 +46,39 @@ export default async function LeaderboardPage() {
       }
     }
 
+    // Fetch championship game (round 6) and champion picks
+    const championMap = new Map<string, { name: string; short_name: string }>();
+
+    const { data: championshipGame } = await supabase
+      .from("games")
+      .select("id")
+      .eq("round", 6)
+      .single();
+
+    if (championshipGame) {
+      const { data: championPicks } = await supabase
+        .from("picks")
+        .select(
+          "bracket_id, predicted_winner:teams!picks_predicted_winner_id_fkey(name, short_name)"
+        )
+        .eq("game_id", championshipGame.id)
+        .in("bracket_id", bracketIds);
+
+      if (championPicks) {
+        for (const pick of championPicks) {
+          const winner = Array.isArray(pick.predicted_winner)
+            ? pick.predicted_winner[0]
+            : pick.predicted_winner;
+          if (winner) {
+            championMap.set(pick.bracket_id, {
+              name: (winner as { name: string; short_name: string }).name,
+              short_name: (winner as { name: string; short_name: string }).short_name,
+            });
+          }
+        }
+      }
+    }
+
     entries = brackets.map((bracket) => {
       const counts = pickCounts.get(bracket.id) ?? {
         correct: 0,
@@ -56,13 +89,14 @@ export default async function LeaderboardPage() {
         agent: Array.isArray(bracket.agent) ? bracket.agent[0] : bracket.agent,
         picks_correct: counts.correct,
         picks_total: counts.total,
+        champion_pick: championMap.get(bracket.id) ?? null,
       } as LeaderboardEntry;
     });
   }
 
   return (
     <main className="min-h-screen px-4 py-12 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-5xl">
+      <div className="mx-auto max-w-6xl">
         <div className="mb-10">
           <h1 className="text-3xl font-bold text-text-primary sm:text-4xl">
             Leaderboard
