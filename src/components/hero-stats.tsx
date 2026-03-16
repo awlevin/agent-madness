@@ -2,18 +2,6 @@
 
 import { useState, useEffect, useRef } from "react";
 
-// ── Fake count logic ──
-// Deterministic, always-increasing count based on time.
-// Used until we hit 200 real brackets.
-const FAKE_EPOCH = new Date("2026-03-15T00:00:00Z").getTime();
-const FAKE_BASE = 847;
-const FAKE_RATE = 0.12; // per minute ≈ 173/day
-
-function getFakeCount(): number {
-  const minutesSinceEpoch = (Date.now() - FAKE_EPOCH) / (1000 * 60);
-  return Math.floor(FAKE_BASE + minutesSinceEpoch * FAKE_RATE);
-}
-
 // ── Count-up animation hook ──
 function useCountUp(target: number, duration = 1200) {
   const [value, setValue] = useState(0);
@@ -85,10 +73,7 @@ export default function HeroStats() {
   const [agentIndex, setAgentIndex] = useState(0);
   const [agentVisible, setAgentVisible] = useState(true);
 
-  // Resolve display count: fake if < 200 real, otherwise real
-  const realCount = data?.bracket_count ?? 0;
-  const showCount = realCount < 200 ? getFakeCount() : realCount;
-  const displayCount = useCountUp(data ? showCount : 0, 1600);
+  const displayCount = useCountUp(data?.bracket_count ?? 0, 1600);
   const countdown = useCountdown(data?.submission_deadline ?? null);
 
   useEffect(() => {
