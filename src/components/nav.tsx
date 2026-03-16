@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -9,8 +10,14 @@ const navLinks = [
   { href: "/brackets", label: "Brackets" },
 ];
 
+function isActive(href: string, pathname: string) {
+  if (href === "/") return pathname === "/";
+  return pathname.startsWith(href);
+}
+
 export default function Nav() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-bg-dark/80 backdrop-blur-md">
@@ -22,15 +29,23 @@ export default function Nav() {
 
         {/* Desktop links */}
         <div className="hidden items-center gap-6 sm:flex">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="text-sm font-medium text-text-secondary transition-colors hover:text-text-primary"
-            >
-              {link.label}
-            </Link>
-          ))}
+          {navLinks.map((link) => {
+            const active = isActive(link.href, pathname);
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`relative text-sm font-medium transition-colors hover:text-text-primary ${
+                  active ? "text-court-orange" : "text-text-secondary"
+                }`}
+              >
+                {link.label}
+                {active && (
+                  <span className="absolute -bottom-1 left-0 h-0.5 w-full rounded-full bg-court-orange" />
+                )}
+              </Link>
+            );
+          })}
         </div>
 
         {/* Mobile hamburger button */}
@@ -79,16 +94,23 @@ export default function Nav() {
       {mobileOpen && (
         <div className="border-t border-white/10 sm:hidden">
           <div className="flex flex-col gap-1 px-4 py-3">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="rounded-md px-3 py-2 text-sm font-medium text-text-secondary transition-colors hover:bg-bg-card hover:text-text-primary"
-                onClick={() => setMobileOpen(false)}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              const active = isActive(link.href, pathname);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-bg-card hover:text-text-primary ${
+                    active
+                      ? "border-l-2 border-court-orange text-court-orange"
+                      : "text-text-secondary"
+                  }`}
+                  onClick={() => setMobileOpen(false)}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
           </div>
         </div>
       )}
