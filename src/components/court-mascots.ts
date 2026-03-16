@@ -137,10 +137,11 @@ function roundRect(
   ctx.closePath();
 }
 
+// All positions are in head-local space (head center is origin).
+// Head is at y=1.4 in group space, so subtract 1.4 from original y values.
 function addMascotDetails(
   THREE: THREELib,
   cfg: MascotConfig,
-  group: THREETypes.Group,
   head: THREETypes.Mesh
 ) {
   const mat = (color: number, roughness = 0.5) =>
@@ -153,31 +154,31 @@ function addMascotDetails(
       const earMat = mat(0xffffff);
       for (const x of [-0.16, 0.16]) {
         const ear = new THREE.Mesh(earGeo, earMat);
-        ear.position.set(x, 1.62, -0.02);
+        ear.position.set(x, 0.22, -0.02);
         ear.scale.set(0.8, 1.1, 0.5);
-        group.add(ear);
+        head.add(ear);
         // Dark inner ear
         const innerGeo = new THREE.SphereGeometry(0.05, 10, 8);
         const innerMat = mat(0xc5050c);
         const inner = new THREE.Mesh(innerGeo, innerMat);
-        inner.position.set(x, 1.62, 0.01);
+        inner.position.set(x, 0.22, 0.01);
         inner.scale.set(0.6, 0.8, 0.3);
-        group.add(inner);
+        head.add(inner);
       }
       // Nose
       const noseGeo = new THREE.SphereGeometry(0.045, 10, 8);
       const noseMat = mat(0x222222, 0.3);
       const nose = new THREE.Mesh(noseGeo, noseMat);
-      nose.position.set(0, 1.35, 0.26);
-      group.add(nose);
+      nose.position.set(0, -0.05, 0.26);
+      head.add(nose);
       // Dark eye patches (badger markings)
       const patchGeo = new THREE.SphereGeometry(0.08, 10, 8);
       const patchMat = mat(0x333333);
       for (const x of [-0.1, 0.1]) {
         const patch = new THREE.Mesh(patchGeo, patchMat);
-        patch.position.set(x, 1.42, 0.17);
+        patch.position.set(x, 0.02, 0.17);
         patch.scale.set(1, 0.8, 0.5);
-        group.add(patch);
+        head.add(patch);
       }
       break;
     }
@@ -186,32 +187,32 @@ function addMascotDetails(
       const crestGeo = new THREE.BoxGeometry(0.04, 0.18, 0.35, 1, 1, 1);
       const crestMat = mat(0xffffff, 0.4);
       const crest = new THREE.Mesh(crestGeo, crestMat);
-      crest.position.set(0, 1.58, -0.02);
-      group.add(crest);
+      crest.position.set(0, 0.18, -0.02);
+      head.add(crest);
       // Helmet brim
       const brimGeo = new THREE.CylinderGeometry(0.27, 0.28, 0.04, 16);
       const brimMat = mat(0x18453b, 0.3);
       const brim = new THREE.Mesh(brimGeo, brimMat);
-      brim.position.set(0, 1.28, 0);
-      group.add(brim);
+      brim.position.set(0, -0.12, 0);
+      head.add(brim);
       break;
     }
     case "Brutus": {
       // Bigger, rounder buckeye head
       head.scale.set(1.35, 1.35, 1.35);
-      // Baseball cap
-      const capGeo = new THREE.SphereGeometry(0.28, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2);
+      // Baseball cap (sizes compensated for 1.35x head scale)
+      const capGeo = new THREE.SphereGeometry(0.207, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2);
       const capMat = mat(0xbb0000, 0.4);
       const cap = new THREE.Mesh(capGeo, capMat);
-      cap.position.set(0, 1.52, 0);
-      group.add(cap);
+      cap.position.set(0, 0.089, 0);
+      head.add(cap);
       // Cap brim
-      const capBrimGeo = new THREE.CylinderGeometry(0.15, 0.18, 0.02, 12);
+      const capBrimGeo = new THREE.CylinderGeometry(0.111, 0.133, 0.015, 12);
       const capBrimMat = mat(0xbb0000, 0.4);
       const capBrim = new THREE.Mesh(capBrimGeo, capBrimMat);
-      capBrim.position.set(0, 1.5, 0.2);
+      capBrim.position.set(0, 0.074, 0.148);
       capBrim.rotation.x = -0.3;
-      group.add(capBrim);
+      head.add(capBrim);
       break;
     }
     case "Goldy": {
@@ -220,17 +221,17 @@ function addMascotDetails(
       const earMat = mat(0xffcc33);
       for (const x of [-0.18, 0.18]) {
         const ear = new THREE.Mesh(earGeo, earMat);
-        ear.position.set(x, 1.58, 0);
+        ear.position.set(x, 0.18, 0);
         ear.scale.set(0.7, 1, 0.5);
-        group.add(ear);
+        head.add(ear);
       }
       // Buck teeth
       const toothGeo = new THREE.BoxGeometry(0.04, 0.06, 0.03);
       const toothMat = mat(0xffffff, 0.3);
       for (const x of [-0.03, 0.03]) {
         const tooth = new THREE.Mesh(toothGeo, toothMat);
-        tooth.position.set(x, 1.3, 0.24);
-        group.add(tooth);
+        tooth.position.set(x, -0.1, 0.24);
+        head.add(tooth);
       }
       break;
     }
@@ -239,17 +240,17 @@ function addMascotDetails(
       const beakGeo = new THREE.ConeGeometry(0.06, 0.14, 8);
       const beakMat = mat(0xffcd00, 0.3);
       const beak = new THREE.Mesh(beakGeo, beakMat);
-      beak.position.set(0, 1.37, 0.3);
+      beak.position.set(0, -0.03, 0.3);
       beak.rotation.x = Math.PI / 2;
-      group.add(beak);
+      head.add(beak);
       // Small feather tufts on top
       const tuftGeo = new THREE.ConeGeometry(0.04, 0.12, 6);
       const tuftMat = mat(0x000000);
       for (const x of [-0.05, 0, 0.05]) {
         const tuft = new THREE.Mesh(tuftGeo, tuftMat);
-        tuft.position.set(x, 1.63, -0.05);
+        tuft.position.set(x, 0.23, -0.05);
         tuft.rotation.z = x * 3;
-        group.add(tuft);
+        head.add(tuft);
       }
       break;
     }
@@ -258,16 +259,16 @@ function addMascotDetails(
       const billGeo = new THREE.SphereGeometry(0.1, 12, 8);
       const billMat = mat(0xff8c00, 0.4);
       const bill = new THREE.Mesh(billGeo, billMat);
-      bill.position.set(0, 1.35, 0.28);
+      bill.position.set(0, -0.05, 0.28);
       bill.scale.set(1.4, 0.4, 1.1);
-      group.add(bill);
+      head.add(bill);
       // Tuft on head
       const tuftGeo = new THREE.SphereGeometry(0.06, 10, 8);
       const tuftMat = mat(0xfee123);
       const tuft = new THREE.Mesh(tuftGeo, tuftMat);
-      tuft.position.set(0, 1.62, -0.03);
+      tuft.position.set(0, 0.22, -0.03);
       tuft.scale.set(1, 1.3, 1);
-      group.add(tuft);
+      head.add(tuft);
       break;
     }
     case "NittanyLion": {
@@ -276,22 +277,22 @@ function addMascotDetails(
       const earMat = mat(0xddd8cc);
       for (const x of [-0.18, 0.18]) {
         const ear = new THREE.Mesh(earGeo, earMat);
-        ear.position.set(x, 1.6, -0.02);
+        ear.position.set(x, 0.2, -0.02);
         ear.scale.set(0.7, 1, 0.5);
-        group.add(ear);
+        head.add(ear);
       }
       // Nose
       const noseGeo = new THREE.SphereGeometry(0.04, 10, 8);
       const noseMat = mat(0x444444, 0.3);
       const nose = new THREE.Mesh(noseGeo, noseMat);
-      nose.position.set(0, 1.36, 0.25);
-      group.add(nose);
+      nose.position.set(0, -0.04, 0.25);
+      head.add(nose);
       // Mane (ring of fluff around head)
       const maneGeo = new THREE.TorusGeometry(0.26, 0.06, 8, 16);
       const maneMat = mat(0xddd8cc, 0.7);
       const mane = new THREE.Mesh(maneGeo, maneMat);
-      mane.position.set(0, 1.4, 0);
-      group.add(mane);
+      mane.position.set(0, 0, 0);
+      head.add(mane);
       break;
     }
     case "PurduePete": {
@@ -301,14 +302,14 @@ function addMascotDetails(
       );
       const hatMat = mat(0xdaa520, 0.3);
       const hatTop = new THREE.Mesh(hatTopGeo, hatMat);
-      hatTop.position.set(0, 1.48, 0);
-      group.add(hatTop);
+      hatTop.position.set(0, 0.08, 0);
+      head.add(hatTop);
       // Hat brim
       const brimGeo = new THREE.CylinderGeometry(0.34, 0.34, 0.02, 16);
       const brimMat = mat(0xdaa520, 0.3);
       const brim = new THREE.Mesh(brimGeo, brimMat);
-      brim.position.set(0, 1.48, 0);
-      group.add(brim);
+      brim.position.set(0, 0.08, 0);
+      head.add(brim);
       break;
     }
   }
@@ -331,7 +332,7 @@ function buildFigure(
   head.position.y = 1.4;
   group.add(head);
 
-  // Eye whites + pupils
+  // Eye whites + pupils (children of head so they track sway/bob)
   const eyeWhiteGeo = new THREE.SphereGeometry(0.055, 12, 10);
   const eyeWhiteMat = new THREE.MeshStandardMaterial({
     color: 0xffffff,
@@ -344,20 +345,20 @@ function buildFigure(
   });
   for (const xOff of [-0.09, 0.09]) {
     const eyeWhite = new THREE.Mesh(eyeWhiteGeo, eyeWhiteMat);
-    eyeWhite.position.set(xOff, 1.43, 0.2);
-    group.add(eyeWhite);
+    eyeWhite.position.set(xOff, 0.03, 0.2);
+    head.add(eyeWhite);
     const pupil = new THREE.Mesh(pupilGeo, pupilMat);
-    pupil.position.set(xOff, 1.43, 0.24);
-    group.add(pupil);
+    pupil.position.set(xOff, 0.03, 0.24);
+    head.add(pupil);
   }
 
   // Mouth (small smile arc)
   const smileGeo = new THREE.TorusGeometry(0.06, 0.012, 8, 12, Math.PI);
   const smileMat = new THREE.MeshStandardMaterial({ color: 0x222222 });
   const smile = new THREE.Mesh(smileGeo, smileMat);
-  smile.position.set(0, 1.33, 0.22);
+  smile.position.set(0, -0.07, 0.22);
   smile.rotation.z = Math.PI;
-  group.add(smile);
+  head.add(smile);
 
   // ── Body (tapered cylinder) ──
   const bodyGeo = new THREE.CylinderGeometry(0.24, 0.2, 0.55, 16);
@@ -439,7 +440,7 @@ function buildFigure(
   group.add(rightLegPivot);
 
   // ── Mascot-specific details (ears, beaks, hats, etc.) ──
-  addMascotDetails(THREE, cfg, group, head);
+  addMascotDetails(THREE, cfg, head);
 
   // ── Banner (optional, high-res) ──
   let banner: THREETypes.Mesh | null = null;
@@ -507,6 +508,10 @@ function animDance(t: number, m: MascotInstance) {
   const sway = Math.sin(t * 3) * 0.15;
   m.body.position.x = sway;
   m.head.position.x = sway;
+  m.leftArmPivot.position.x = -0.3 + sway;
+  m.rightArmPivot.position.x = 0.3 + sway;
+  m.leftLegPivot.position.x = -0.1 + sway;
+  m.rightLegPivot.position.x = 0.1 + sway;
   m.leftArmPivot.rotation.z = Math.sin(t * 3) * 0.8 + 0.5;
   m.rightArmPivot.rotation.z = Math.sin(t * 3 + 1) * -0.8 - 0.5;
   m.leftLegPivot.rotation.x = Math.sin(t * 6) * 0.2;
