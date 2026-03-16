@@ -70,8 +70,6 @@ interface StatsData {
 
 export default function HeroStats() {
   const [data, setData] = useState<StatsData | null>(null);
-  const [agentIndex, setAgentIndex] = useState(0);
-  const [agentVisible, setAgentVisible] = useState(true);
 
   const displayCount = useCountUp(data?.bracket_count ?? 0, 1600);
   const countdown = useCountdown(data?.submission_deadline ?? null);
@@ -83,21 +81,6 @@ export default function HeroStats() {
       .catch(() => {});
   }, []);
 
-  // Cycle through latest agents
-  const agents = data?.latest_agents ?? [];
-  useEffect(() => {
-    if (agents.length <= 1) return;
-
-    const id = setInterval(() => {
-      setAgentVisible(false);
-      setTimeout(() => {
-        setAgentIndex((i) => (i + 1) % agents.length);
-        setAgentVisible(true);
-      }, 400);
-    }, 3500);
-    return () => clearInterval(id);
-  }, [agents.length]);
-
   if (!data) return null;
 
   const deadlineExpired =
@@ -108,64 +91,30 @@ export default function HeroStats() {
     countdown.s === 0;
 
   return (
-    <div className="mt-4 flex flex-col items-center gap-2">
-      {/* ── Bracket counter ── */}
-      <div className="inline-flex items-center gap-2 px-4 py-1.5 border border-white/15 bg-bg-dark/70 backdrop-blur-sm rounded-sm">
-        <span className="relative flex h-2 w-2 shrink-0">
+    <div className="mt-3 flex items-center justify-center gap-2 sm:gap-3 font-[family-name:var(--font-pixel)] text-[9px] sm:text-[10px]">
+      <span className="flex items-center gap-1.5">
+        <span className="relative flex h-1.5 w-1.5 shrink-0">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-arcade-green opacity-60" />
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-arcade-green shadow-[0_0_6px_rgba(0,255,65,0.8)]" />
+          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-arcade-green" />
         </span>
-        <span className="font-[family-name:var(--font-pixel)] text-[10px] sm:text-xs text-arcade-green/90 tracking-[0.15em]">
-          <span className="text-arcade-green pixel-glow-green">
-            {displayCount.toLocaleString()}
-          </span>{" "}
-          BRACKETS LOCKED IN
+        <span className="text-arcade-green">
+          {displayCount.toLocaleString()}
         </span>
-      </div>
+        <span className="text-arcade-green/60">BRACKETS</span>
+      </span>
 
-      {/* ── Countdown timer ── */}
       {countdown && !deadlineExpired && (
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 border border-court-orange/20 bg-bg-dark/50 backdrop-blur-sm rounded-sm">
-          <span className="font-[family-name:var(--font-pixel)] text-[8px] sm:text-[10px] text-text-secondary/70 tracking-wider">
-            SUBMISSIONS CLOSE IN
-          </span>
-          <span className="font-[family-name:var(--font-pixel)] text-[8px] sm:text-[10px] text-court-orange tracking-[0.12em]">
-            {countdown.d > 0 && (
-              <>
-                <span className="pixel-glow-orange">{countdown.d}</span>D{" "}
-              </>
-            )}
-            <span className="pixel-glow-orange">
-              {String(countdown.h).padStart(2, "0")}
+        <>
+          <span className="text-text-secondary/25">·</span>
+          <span className="text-text-secondary/60">
+            CLOSES{" "}
+            <span className="text-court-orange">
+              {countdown.d > 0 && <>{countdown.d}D </>}
+              {String(countdown.h).padStart(2, "0")}H{" "}
+              {String(countdown.m).padStart(2, "0")}M
             </span>
-            H{" "}
-            <span className="pixel-glow-orange">
-              {String(countdown.m).padStart(2, "0")}
-            </span>
-            M{" "}
-            <span className="pixel-glow-orange">
-              {String(countdown.s).padStart(2, "0")}
-            </span>
-            S
           </span>
-        </div>
-      )}
-
-      {/* ── Latest entrant ticker ── */}
-      {agents.length > 0 && (
-        <div className="h-5 flex items-center overflow-hidden">
-          <span
-            className={`font-[family-name:var(--font-pixel)] text-[8px] sm:text-[9px] text-arcade-yellow/60 tracking-wider transition-all duration-300 ${
-              agentVisible
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 -translate-y-2"
-            }`}
-          >
-            <span className="text-arcade-yellow/40">▸</span>{" "}
-            {agents[agentIndex]?.toUpperCase()} JUST ENTERED{" "}
-            <span className="text-arcade-yellow/40">◂</span>
-          </span>
-        </div>
+        </>
       )}
     </div>
   );

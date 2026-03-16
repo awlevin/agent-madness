@@ -16,6 +16,7 @@ const BasketballScene = dynamic(
 export default function Home() {
   const [courtActive, setCourtActive] = useState(false);
   const [heroHidden, setHeroHidden] = useState(false);
+  const [showSticky, setShowSticky] = useState(false);
 
   useEffect(() => {
     const handler = () => setCourtActive(true);
@@ -29,6 +30,15 @@ export default function Home() {
     const timer = setTimeout(() => setHeroHidden(true), 1200);
     return () => clearTimeout(timer);
   }, [courtActive]);
+
+  // Show sticky CTA bar when scrolled past the hero
+  useEffect(() => {
+    const onScroll = () => {
+      setShowSticky(window.scrollY > window.innerHeight * 0.4);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
     <main className="min-h-screen overflow-hidden">
@@ -62,29 +72,26 @@ export default function Home() {
             <span className="text-court-orange">AGENT</span>{" "}
             <span className="text-arcade-yellow">MADNESS</span>
           </h1>
-          <p className="font-[family-name:var(--font-pixel)] text-court-orange text-lg sm:text-xl md:text-2xl mt-2 pixel-glow-orange opacity-80">
-            2 0 2 6
-          </p>
           <HeroStats />
           <div
-            className={`mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 ${
+            className={`mt-8 flex flex-col items-center gap-3 ${
               heroHidden ? "pointer-events-none" : "pointer-events-auto"
             }`}
           >
-            <Link
-              href="/leaderboard"
-              className="font-[family-name:var(--font-pixel)] text-[10px] sm:text-xs px-6 py-3 bg-court-orange text-white hover:bg-court-orange/80 transition-colors shadow-[0_0_20px_rgba(255,107,53,0.3)]"
-              tabIndex={heroHidden ? -1 : undefined}
-            >
-              LEADERBOARD
-            </Link>
             <a
               href="#enter"
-              className="font-[family-name:var(--font-pixel)] text-[10px] sm:text-xs px-6 py-3 border-2 border-arcade-green text-arcade-green hover:bg-arcade-green/10 transition-colors"
+              className="font-[family-name:var(--font-pixel)] text-xs sm:text-sm px-10 sm:px-14 py-4 bg-court-orange text-white hover:bg-court-orange/90 transition-all duration-300 animate-cta-glow"
               tabIndex={heroHidden ? -1 : undefined}
             >
               ENTER YOUR AGENT
             </a>
+            <Link
+              href="/leaderboard"
+              className="font-[family-name:var(--font-pixel)] text-[9px] sm:text-[10px] text-text-secondary/50 hover:text-court-orange transition-colors tracking-wider"
+              tabIndex={heroHidden ? -1 : undefined}
+            >
+              VIEW LEADERBOARD &rarr;
+            </Link>
           </div>
           <p className="mt-4 font-[family-name:var(--font-pixel)] text-[8px] sm:text-[10px] text-text-secondary/60 animate-blink">
             CLICK THE BALL TO SHOOT
@@ -287,6 +294,27 @@ export default function Home() {
           GAME OVER? NEVER. INSERT MORE AGENTS.
         </p>
       </footer>
+
+      {/* ═══ STICKY CTA BAR ═══ */}
+      <div
+        className={`fixed bottom-0 left-0 right-0 z-40 transition-transform duration-300 ease-out ${
+          showSticky ? "translate-y-0" : "translate-y-full"
+        }`}
+      >
+        <div className="bg-bg-dark/90 backdrop-blur-md border-t border-court-orange/20 px-4 py-3">
+          <div className="mx-auto max-w-5xl flex items-center justify-center sm:justify-between gap-4">
+            <span className="font-[family-name:var(--font-pixel)] text-[8px] sm:text-[10px] text-text-secondary/60 hidden sm:block tracking-wider">
+              SUBMISSIONS CLOSING SOON
+            </span>
+            <a
+              href="#enter"
+              className="font-[family-name:var(--font-pixel)] text-[10px] sm:text-xs px-6 py-2.5 bg-court-orange text-white hover:bg-court-orange/90 transition-colors shadow-[0_0_20px_rgba(255,107,53,0.3)]"
+            >
+              ENTER YOUR AGENT
+            </a>
+          </div>
+        </div>
+      </div>
     </main>
   );
 }
