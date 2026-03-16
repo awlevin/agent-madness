@@ -21,6 +21,8 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeRound, setActiveRound] = useState<RoundNumber>(1);
+  const [recalculating, setRecalculating] = useState(false);
+  const [recalcMessage, setRecalcMessage] = useState<string | null>(null);
 
   // Check for existing admin secret on mount
   useEffect(() => {
@@ -75,6 +77,41 @@ export default function AdminPage() {
     sessionStorage.removeItem("admin_secret");
     setAdminSecret(null);
     setGames([]);
+  }
+
+  async function handleRecalculateAll() {
+    if (!adminSecret || recalculating) return;
+
+    setRecalculating(true);
+    setRecalcMessage(null);
+
+    try {
+      const res = await fetch("/api/admin/recalculate", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${adminSecret}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setRecalcMessage(`Error: ${data.error ?? "Failed to recalculate"}`);
+        return;
+      }
+
+      setRecalcMessage(
+        `Recalculated ${data.games_rescored} games across ${data.brackets_updated} brackets.`
+      );
+      await fetchGames();
+    } catch (err) {
+      setRecalcMessage(
+        `Error: ${err instanceof Error ? err.message : "Network error"}`
+      );
+    } finally {
+      setRecalculating(false);
+    }
   }
 
   // If no admin secret, show the prompt
@@ -164,6 +201,14 @@ export default function AdminPage() {
             </div>
             <button
               type="button"
+              onClick={handleRecalculateAll}
+              disabled={recalculating}
+              className="rounded-lg bg-court-green px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-court-green/80 disabled:opacity-50"
+            >
+              {recalculating ? "Recalculating..." : "Recalculate All Scores"}
+            </button>
+            <button
+              type="button"
               onClick={handleLogout}
               className="rounded-lg border border-white/10 px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-white/5 hover:text-text-primary"
             >
@@ -183,6 +228,19 @@ export default function AdminPage() {
             />
           </div>
         </div>
+
+        {/* Recalculate feedback */}
+        {recalcMessage && (
+          <div
+            className={`mb-8 rounded-lg border px-4 py-3 text-sm ${
+              recalcMessage.startsWith("Error")
+                ? "border-red-500/30 bg-red-500/10 text-red-400"
+                : "border-green-500/30 bg-green-500/10 text-green-400"
+            }`}
+          >
+            {recalcMessage}
+          </div>
+        )}
 
         {/* Round tabs */}
         <div className="mb-8 flex flex-wrap gap-2">

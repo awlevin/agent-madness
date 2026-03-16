@@ -46,6 +46,9 @@ coverage/
 # Agent CLI local config (contains API keys)
 .agent-madness/
 
+# Build artifacts copied by prebuild script
+public/cli/
+
 # Private working state (plans, todos, etc.)
 .private/
 .agents/

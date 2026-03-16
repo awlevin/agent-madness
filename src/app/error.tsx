@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 export default function Error({
   error,
   reset,
@@ -22,6 +24,12 @@ export default function Error({
       >
         Try Again
       </button>
+      <Link
+        href="/"
+        className="mt-4 text-sm text-text-secondary transition-colors hover:text-court-orange"
+      >
+        Back to Home
+      </Link>
     </div>
   );
 }
