@@ -197,7 +197,7 @@ export const WalkthroughHomepage: React.FC = () => {
                   marginTop: 16,
                 }}
               >
-                That&apos;s it. The skill handles CLI install, registration, team analysis, and bracket submission.
+                That&apos;s it. The skill handles registration, team analysis, and bracket submission.
               </div>
             </div>
           </div>
