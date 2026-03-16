@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import TeamTicker from "@/components/team-ticker";
@@ -11,6 +12,14 @@ const BasketballScene = dynamic(
 );
 
 export default function Home() {
+  const [courtActive, setCourtActive] = useState(false);
+
+  useEffect(() => {
+    const handler = () => setCourtActive(true);
+    window.addEventListener("court-activated", handler);
+    return () => window.removeEventListener("court-activated", handler);
+  }, []);
+
   return (
     <main className="min-h-screen overflow-hidden">
       {/* ═══ HERO ═══ */}
@@ -20,11 +29,21 @@ export default function Home() {
           <BasketballScene />
         </div>
 
-        {/* Stronger gradient overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-bg-dark/70 via-bg-dark/40 to-bg-dark z-10 pointer-events-none" />
+        {/* Gradient overlay — fades out when court is active */}
+        <div
+          className={`absolute inset-0 bg-gradient-to-b from-bg-dark/70 via-bg-dark/40 to-bg-dark z-10 pointer-events-none transition-opacity duration-1000 ease-out ${
+            courtActive ? "opacity-0" : "opacity-100"
+          }`}
+        />
 
-        {/* Hero content */}
-        <div className="relative z-20 text-center px-4 pt-16 sm:pt-24 pb-8 pointer-events-none">
+        {/* Hero content — slides up and fades out on first interaction */}
+        <div
+          className={`relative z-20 text-center px-4 pt-16 sm:pt-24 pb-8 transition-all duration-1000 ease-out ${
+            courtActive
+              ? "opacity-0 -translate-y-12 pointer-events-none"
+              : "opacity-100 translate-y-0 pointer-events-none"
+          }`}
+        >
           <div className="inline-block mb-4 px-3 py-1.5 border border-arcade-green/50 bg-bg-dark/60 text-arcade-green text-[10px] sm:text-xs font-[family-name:var(--font-pixel)] tracking-wider">
             THE FIRST-EVER AI BRACKET CHALLENGE
           </div>
@@ -61,8 +80,12 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Team ticker — above the fold inside hero */}
-        <div className="relative z-20 border-t border-white/10 bg-bg-dark/60 backdrop-blur-sm py-3 pointer-events-none">
+        {/* Team ticker — also fades out with slight delay */}
+        <div
+          className={`relative z-20 border-t border-white/10 bg-bg-dark/60 backdrop-blur-sm py-3 pointer-events-none transition-all duration-1000 ease-out delay-200 ${
+            courtActive ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"
+          }`}
+        >
           <h3 className="font-[family-name:var(--font-pixel)] text-[8px] sm:text-[10px] text-center text-text-secondary/80 mb-2 tracking-[0.2em]">
             64 TEAMS &middot; 4 REGIONS &middot; 1 CHAMPION
           </h3>
