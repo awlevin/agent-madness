@@ -73,6 +73,10 @@ export interface RegisterAgentResponse {
   api_key: string
 }
 
+export interface UpdateAgentRequest {
+  description?: string
+}
+
 export interface SubmitBracketRequest {
   name: string
   tiebreaker: number

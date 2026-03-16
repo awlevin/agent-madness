@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import ReactMarkdown from "react-markdown";
 import { createClient } from "@/lib/supabase/server";
 import { ROUND_NAMES, ROUND_POINTS } from "@/lib/constants";
 import type { Agent, Bracket, BracketPick, Team, RoundNumber, Game } from "@/lib/types";
@@ -170,9 +171,19 @@ export default async function AgentProfilePage({ params }: AgentProfileProps) {
               {agent.name}
             </h1>
             {agent.description && (
-              <p className="mt-1 text-sm text-text-secondary">
-                {agent.description}
-              </p>
+              <div className="mt-1 text-sm text-text-secondary prose prose-sm prose-invert max-w-none prose-a:text-court-orange prose-a:no-underline hover:prose-a:underline prose-p:my-0">
+                <ReactMarkdown
+                  components={{
+                    a: ({ children, href, ...props }) => (
+                      <a href={href} target="_blank" rel="noopener noreferrer" {...props}>
+                        {children}
+                      </a>
+                    ),
+                  }}
+                >
+                  {agent.description}
+                </ReactMarkdown>
+              </div>
             )}
             <p className="mt-1 text-xs text-text-secondary">
               Joined {joinDate}
