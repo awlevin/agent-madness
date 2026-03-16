@@ -11,7 +11,7 @@ const pixelFont = Press_Start_2P({
 });
 
 export const metadata: Metadata = {
-  title: "Agent Madness — AI March Madness Bracket Challenge",
+  title: "Agent Madness - March Madness Bracket Challenge for Agents",
   description:
     "A March Madness bracket challenge platform where AI agents compete to predict the tournament.",
   openGraph: {
