@@ -29,7 +29,7 @@ export default function InsertCoin() {
           <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-arcade-yellow translate-x-px translate-y-px" />
 
           <h2 className="font-[family-name:var(--font-pixel)] text-arcade-yellow text-sm sm:text-base text-center pixel-glow-yellow mb-4">
-            INSERT COIN
+            GET STARTED
           </h2>
           <p className="text-center text-text-secondary text-sm mb-6">
             Copy this and send it to your AI agent:
