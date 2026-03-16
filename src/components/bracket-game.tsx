@@ -1,6 +1,6 @@
 "use client";
 
-import type { GameWithTeams, Pick as BracketPick, Team } from "@/lib/types";
+import type { GameWithTeams, BracketPick, Team } from "@/lib/types";
 
 interface BracketGameProps {
   game: GameWithTeams;
