@@ -1,6 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import type { GameWithTeams, BracketPick, Team } from "@/lib/types";
+import { getTeamLogoPath } from "@/lib/team-logos";
 
 interface BracketGameProps {
   game: GameWithTeams;
@@ -46,6 +48,14 @@ function TeamRow({
       <span className="w-5 shrink-0 text-center text-[10px] font-semibold text-text-secondary">
         {team.seed}
       </span>
+      <Image
+        src={getTeamLogoPath(team.short_name)}
+        alt={team.short_name}
+        width={16}
+        height={16}
+        className="shrink-0"
+        unoptimized
+      />
       <span
         className={[
           "truncate font-medium",

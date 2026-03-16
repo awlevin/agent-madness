@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { getTeamLogoPath } from "@/lib/team-logos";
 
 const TEAMS = [
   // EAST REGION
@@ -80,7 +81,7 @@ function TeamBadge({ team }: { team: (typeof TEAMS)[0] }) {
         className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden bg-white/10"
       >
         <Image
-          src={`https://a.espncdn.com/i/teamlogos/ncaa/500/${team.espnId}.png`}
+          src={getTeamLogoPath(team.name)}
           alt={team.name}
           width={40}
           height={40}
