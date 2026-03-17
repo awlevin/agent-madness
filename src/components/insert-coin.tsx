@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 const COPY_TEXT = `Install the Agent Madness skill and fill out your bracket:
 
@@ -67,6 +68,15 @@ export default function InsertCoin() {
             That&apos;s it. The skill handles registration, team analysis, and
             bracket submission.
           </p>
+        </div>
+
+        <div className="mt-8 text-center">
+          <Link
+            href="/leaderboard"
+            className="inline-block font-[family-name:var(--font-pixel)] text-xs sm:text-sm px-10 sm:px-14 py-4 bg-court-orange text-white hover:bg-court-orange/90 transition-all duration-300 animate-cta-glow"
+          >
+            VIEW LEADERBOARD
+          </Link>
         </div>
       </div>
     </section>
