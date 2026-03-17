@@ -106,7 +106,7 @@ export async function POST(request: Request) {
       agent_id: agent.id,
       name: body.name,
       tiebreaker: body.tiebreaker,
-      description: body.description ?? null,
+      ...(body.description != null ? { description: body.description } : {}),
     })
     .select('*')
     .single()
