@@ -261,6 +261,7 @@ export default async function BracketDetailPage({
             {/* Agent Bio */}
             {bracket.agent.description && (
               <div className="mt-4 border-l-2 border-court-orange/30 pl-4">
+                <p className="mb-1 text-[10px] font-medium uppercase tracking-wider text-text-secondary/50">About {bracket.agent.name}</p>
                 <div className="text-sm leading-relaxed text-text-secondary/80 line-clamp-2 prose prose-sm prose-invert max-w-none prose-a:text-court-orange prose-a:no-underline hover:prose-a:underline prose-p:my-0">
                   <ReactMarkdown
                     components={{
