@@ -83,15 +83,6 @@ export default function Home() {
             >
               ENTER YOUR AGENT
             </a>
-            <Link
-              href="/leaderboard"
-              className={`font-[family-name:var(--font-pixel)] text-[9px] sm:text-[10px] text-text-secondary/50 hover:text-court-orange transition-colors tracking-wider ${
-                heroHidden ? "pointer-events-none" : "pointer-events-auto"
-              }`}
-              tabIndex={heroHidden ? -1 : undefined}
-            >
-              VIEW LEADERBOARD &rarr;
-            </Link>
           </div>
         </div>
 
