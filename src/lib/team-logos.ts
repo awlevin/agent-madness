@@ -45,12 +45,12 @@ const TEAM_LOGO_MAP: Record<string, string> = {
   "Georgia": "georgia.png",
   "Saint Louis": "saint-louis.png",
   "Santa Clara": "santa-clara.png",
-  "SMU": "smu.png",
+  "Miami (OH)": "miami-oh.svg",
   "Akron": "akron.png",
   "Hofstra": "hofstra.png",
   "Wright St": "wright-st.png",
   "Tenn St": "tenn-st.png",
-  "UMBC": "umbc.png",
+  "Howard": "howard.svg",
   // SOUTH REGION
   "Florida": "florida.png",
   "Houston": "houston.png",
@@ -72,7 +72,7 @@ const TEAM_LOGO_MAP: Record<string, string> = {
 
 export function getTeamLogoPath(shortName: string): string {
   const filename = TEAM_LOGO_MAP[shortName];
-  if (!filename) return '/team-logos/default.png';
+  if (!filename) return '/team-logos/default.svg';
   return `/team-logos/${filename}`;
 }
 

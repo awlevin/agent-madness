@@ -50,12 +50,12 @@
       "8": { "name": "Georgia Bulldogs", "short_name": "Georgia" },
       "9": { "name": "Saint Louis Billikens", "short_name": "Saint Louis" },
       "10": { "name": "Santa Clara Broncos", "short_name": "Santa Clara" },
-      "11": { "name": "SMU Mustangs", "short_name": "SMU" },
+      "11": { "name": "Miami RedHawks", "short_name": "Miami (OH)" },
       "12": { "name": "Akron Zips", "short_name": "Akron" },
       "13": { "name": "Hofstra Pride", "short_name": "Hofstra" },
       "14": { "name": "Wright State Raiders", "short_name": "Wright St" },
       "15": { "name": "Tennessee State Tigers", "short_name": "Tenn St" },
-      "16": { "name": "UMBC Retrievers", "short_name": "UMBC" }
+      "16": { "name": "Howard Bison", "short_name": "Howard" }
     },
     "south": {
       "1": { "name": "Florida Gators", "short_name": "Florida" },

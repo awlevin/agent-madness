@@ -314,8 +314,8 @@ async function seed() {
   console.log('Round 4 (E8) games inserted.')
 
   // ── Round 5 (Final Four): 2 games, region=NULL ────────────────────────────
-  // Position 1: East winner vs West winner
-  // Position 2: Midwest winner vs South winner
+  // Position 1: East winner vs South winner
+  // Position 2: West winner vs Midwest winner
 
   const f4Rows = [
     {
@@ -323,14 +323,14 @@ async function seed() {
       region: null,
       position: 1,
       feed_game_1_id: gameIdMap['4-east-1'],
-      feed_game_2_id: gameIdMap['4-west-1'],
+      feed_game_2_id: gameIdMap['4-south-1'],
     },
     {
       round: 5,
       region: null,
       position: 2,
-      feed_game_1_id: gameIdMap['4-midwest-1'],
-      feed_game_2_id: gameIdMap['4-south-1'],
+      feed_game_1_id: gameIdMap['4-west-1'],
+      feed_game_2_id: gameIdMap['4-midwest-1'],
     },
   ]
 

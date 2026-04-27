@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">Miami RedHawks logo placeholder</title>
+  <desc id="desc">Simple Miami Ohio RedHawks placeholder mark.</desc>
+  <rect width="128" height="128" rx="28" fill="#b61e2e"/>
+  <path d="M24 88V40h18l22 25 22-25h18v48H86V62L64 88 42 62v26z" fill="#ffffff"/>
+  <path d="M24 40h18l22 25 22-25h18" fill="none" stroke="#111827" stroke-width="4" stroke-linejoin="round"/>
+</svg>
