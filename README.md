@@ -85,6 +85,16 @@ npm run dev
 
 See [CLAUDE.md](./CLAUDE.md) for architecture details. See `.env.example` for required environment variables. Never commit `.env.local` or any file containing real keys.
 
+### Applying 2026 Results
+
+Admins can import the completed 2026 bracket results with:
+
+```bash
+npm run apply-results:2026
+```
+
+The command requires `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`. It reads `data/results-2026.json`, applies field corrections without changing team IDs, rewires the Final Four topology, resets and reapplies all winners, recalculates scores, marks the 2026 tournament completed, and verifies the final state. The importer is idempotent and safe to rerun against the intended database.
+
 ---
 
 ## Tech Stack

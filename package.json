@@ -10,7 +10,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "seed": "tsx scripts/seed-tournament.ts"
+    "seed": "tsx scripts/seed-tournament.ts",
+    "apply-results:2026": "tsx scripts/apply-results-2026.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.6.1",
