@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">Default team logo</title>
+  <desc id="desc">Generic basketball placeholder logo.</desc>
+  <rect width="128" height="128" rx="28" fill="#f3f4f6"/>
+  <circle cx="64" cy="64" r="42" fill="#f97316"/>
+  <path d="M24 64h80M64 22v84M34 36c18 18 42 18 60 0M34 92c18-18 42-18 60 0" fill="none" stroke="#7c2d12" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="64" cy="64" r="42" fill="none" stroke="#111827" stroke-width="4"/>
+</svg>

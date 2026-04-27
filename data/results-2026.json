@@ -1,0 +1,108 @@
+{
+  "year": 2026,
+  "sources": [
+    {
+      "label": "NCAA official bracket",
+      "url": "https://www.ncaa.com/brackets/basketball-men/d1/2026"
+    },
+    {
+      "label": "Wikipedia completed tournament table",
+      "url": "https://en.wikipedia.org/wiki/2026_NCAA_Division_I_men%27s_basketball_tournament"
+    }
+  ],
+  "field_corrections": [
+    {
+      "region": "midwest",
+      "seed": 16,
+      "from_short_name": "UMBC",
+      "to": { "name": "Howard Bison", "short_name": "Howard" }
+    },
+    {
+      "region": "midwest",
+      "seed": 11,
+      "from_short_name": "SMU",
+      "to": { "name": "Miami RedHawks", "short_name": "Miami (OH)" }
+    }
+  ],
+  "final_four_feed_order": [
+    {
+      "position": 1,
+      "feeders": [
+        { "region": "east", "round": 4, "position": 1 },
+        { "region": "south", "round": 4, "position": 1 }
+      ]
+    },
+    {
+      "position": 2,
+      "feeders": [
+        { "region": "west", "round": 4, "position": 1 },
+        { "region": "midwest", "round": 4, "position": 1 }
+      ]
+    }
+  ],
+  "results": [
+    { "round": 1, "region": "east", "position": 1, "winner_short_name": "Duke" },
+    { "round": 1, "region": "east", "position": 2, "winner_short_name": "TCU" },
+    { "round": 1, "region": "east", "position": 3, "winner_short_name": "St John's" },
+    { "round": 1, "region": "east", "position": 4, "winner_short_name": "Kansas" },
+    { "round": 1, "region": "east", "position": 5, "winner_short_name": "Louisville" },
+    { "round": 1, "region": "east", "position": 6, "winner_short_name": "Mich St" },
+    { "round": 1, "region": "east", "position": 7, "winner_short_name": "UCLA" },
+    { "round": 1, "region": "east", "position": 8, "winner_short_name": "UConn" },
+    { "round": 1, "region": "west", "position": 1, "winner_short_name": "Arizona" },
+    { "round": 1, "region": "west", "position": 2, "winner_short_name": "Utah St" },
+    { "round": 1, "region": "west", "position": 3, "winner_short_name": "High Point" },
+    { "round": 1, "region": "west", "position": 4, "winner_short_name": "Arkansas" },
+    { "round": 1, "region": "west", "position": 5, "winner_short_name": "Texas" },
+    { "round": 1, "region": "west", "position": 6, "winner_short_name": "Gonzaga" },
+    { "round": 1, "region": "west", "position": 7, "winner_short_name": "Miami FL" },
+    { "round": 1, "region": "west", "position": 8, "winner_short_name": "Purdue" },
+    { "round": 1, "region": "midwest", "position": 1, "winner_short_name": "Michigan" },
+    { "round": 1, "region": "midwest", "position": 2, "winner_short_name": "Saint Louis" },
+    { "round": 1, "region": "midwest", "position": 3, "winner_short_name": "Texas Tech" },
+    { "round": 1, "region": "midwest", "position": 4, "winner_short_name": "Alabama" },
+    { "round": 1, "region": "midwest", "position": 5, "winner_short_name": "Tennessee" },
+    { "round": 1, "region": "midwest", "position": 6, "winner_short_name": "Virginia" },
+    { "round": 1, "region": "midwest", "position": 7, "winner_short_name": "Kentucky" },
+    { "round": 1, "region": "midwest", "position": 8, "winner_short_name": "Iowa St" },
+    { "round": 1, "region": "south", "position": 1, "winner_short_name": "Florida" },
+    { "round": 1, "region": "south", "position": 2, "winner_short_name": "Iowa" },
+    { "round": 1, "region": "south", "position": 3, "winner_short_name": "Vanderbilt" },
+    { "round": 1, "region": "south", "position": 4, "winner_short_name": "Nebraska" },
+    { "round": 1, "region": "south", "position": 5, "winner_short_name": "VCU" },
+    { "round": 1, "region": "south", "position": 6, "winner_short_name": "Illinois" },
+    { "round": 1, "region": "south", "position": 7, "winner_short_name": "Texas A&M" },
+    { "round": 1, "region": "south", "position": 8, "winner_short_name": "Houston" },
+    { "round": 2, "region": "east", "position": 1, "winner_short_name": "Duke" },
+    { "round": 2, "region": "east", "position": 2, "winner_short_name": "St John's" },
+    { "round": 2, "region": "east", "position": 3, "winner_short_name": "Mich St" },
+    { "round": 2, "region": "east", "position": 4, "winner_short_name": "UConn" },
+    { "round": 2, "region": "west", "position": 1, "winner_short_name": "Arizona" },
+    { "round": 2, "region": "west", "position": 2, "winner_short_name": "Arkansas" },
+    { "round": 2, "region": "west", "position": 3, "winner_short_name": "Texas" },
+    { "round": 2, "region": "west", "position": 4, "winner_short_name": "Purdue" },
+    { "round": 2, "region": "midwest", "position": 1, "winner_short_name": "Michigan" },
+    { "round": 2, "region": "midwest", "position": 2, "winner_short_name": "Alabama" },
+    { "round": 2, "region": "midwest", "position": 3, "winner_short_name": "Tennessee" },
+    { "round": 2, "region": "midwest", "position": 4, "winner_short_name": "Iowa St" },
+    { "round": 2, "region": "south", "position": 1, "winner_short_name": "Iowa" },
+    { "round": 2, "region": "south", "position": 2, "winner_short_name": "Nebraska" },
+    { "round": 2, "region": "south", "position": 3, "winner_short_name": "Illinois" },
+    { "round": 2, "region": "south", "position": 4, "winner_short_name": "Houston" },
+    { "round": 3, "region": "east", "position": 1, "winner_short_name": "Duke" },
+    { "round": 3, "region": "east", "position": 2, "winner_short_name": "UConn" },
+    { "round": 3, "region": "west", "position": 1, "winner_short_name": "Arizona" },
+    { "round": 3, "region": "west", "position": 2, "winner_short_name": "Purdue" },
+    { "round": 3, "region": "midwest", "position": 1, "winner_short_name": "Michigan" },
+    { "round": 3, "region": "midwest", "position": 2, "winner_short_name": "Tennessee" },
+    { "round": 3, "region": "south", "position": 1, "winner_short_name": "Iowa" },
+    { "round": 3, "region": "south", "position": 2, "winner_short_name": "Illinois" },
+    { "round": 4, "region": "east", "position": 1, "winner_short_name": "UConn" },
+    { "round": 4, "region": "west", "position": 1, "winner_short_name": "Arizona" },
+    { "round": 4, "region": "midwest", "position": 1, "winner_short_name": "Michigan" },
+    { "round": 4, "region": "south", "position": 1, "winner_short_name": "Illinois" },
+    { "round": 5, "region": null, "position": 1, "winner_short_name": "UConn" },
+    { "round": 5, "region": null, "position": 2, "winner_short_name": "Michigan" },
+    { "round": 6, "region": null, "position": 1, "winner_short_name": "Michigan" }
+  ]
+}
